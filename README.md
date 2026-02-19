@@ -13,6 +13,12 @@ A collection of patches for the [DROID](https://shop.dermannmitdermaschine.de) m
 | [tintinnalogia-8bell-plainbob.ini](tintinnalogia-8bell-plainbob.ini) | 8-bell change ringing sequencer implementing Plain Hunt, Grandsire, and Plain Bob Major methods. Permutes pitched bells according to traditional English ringing rules. | p2b8 p2b8 p10 b32 |
 | [droid-tb303-acid.ini](droid-tb303-acid.ini) | TB-303 acid bass line generator with generative and fixed pattern modes, b32 step editing, probabilistic slide, accent envelopes, and 4 embedded classic acid patterns. | p2b8 p2b8 b32 |
 
+### Rhythm Generators
+
+| Patch | Description | Controllers |
+|-------|-------------|-------------|
+| [droid-zularic-repetitor.ini](droid-zularic-repetitor.ini) | Multi Repetitor — 3-bank rhythmic gate generator with 4 outputs. Bank 1 (ZR): 8 Zularic patterns (African & world rhythms). Bank 2 (NR): 2 Numeric Repetitor patterns (algorithmic). Bank 3: Euclidean rhythms (1-13 beats, 4 phase-offset outputs). | p2b8 p2b8 |
+
 ### Disting NT Ports
 
 Ports of algorithms from the Expert Sleepers disting NT to DROID hardware.
@@ -37,6 +43,11 @@ Ports of algorithms from the Expert Sleepers disting NT to DROID hardware.
 ## TB-303 Pattern Library
 
 [tb303-pattern-library.json](tb303-pattern-library.json) contains 70 CC BY-SA acid bass patterns from [acid-tabs.com](https://www.acid-tabs.com/) (credit: J.McConaghy). Each pattern has 16 steps with note, octave, gate type, accent, and slide data. Four curated patterns are embedded directly in the TB-303 patch as fixed playback patterns.
+
+## Multi Repetitor Pattern Libraries
+
+- [zr-patterns.json](zr-patterns.json) — 29 Zularic Repetitor patterns extracted from the [ZR manual](https://manuals.noiseengineering.us/zr/), including Old World (African/12-step) and New World (Funk/Rock/16-step) banks with 4 rows each (mother + 3 children).
+- [mr-patterns.json](mr-patterns.json) — 52 Multi Repetitor patterns extracted from the [MR manual](https://manuals.noiseengineering.us/mr/): 16 Numeric (algorithmic prime rhythms), 16 Zularic (world music), and 20 Euclidean (generalized Euclidean). All 16-step, 4 rows per pattern.
 
 ## Documentation
 
