@@ -16,6 +16,7 @@
 | `droid-sync-latch.ini` | Musical boundary transport sync (port of disting NT) |
 | `droid-bouncing-ball.ini` | Classic bouncing ball trigger generator with decay and gravity |
 | `droid-maths-classics.ini` | Multi-function utility: quadrature LFO, arcade trill, VC slew, pulse delay, clock divider |
+| `droid-zularic-repetitor.ini` | Multi Repetitor — 3-bank rhythmic gate generator (ZR / Numeric / Euclidean) |
 
 ---
 
@@ -699,3 +700,120 @@ Five iconic Make Noise MATHS patches combined into a single DROID utility module
 5. **Stepped vs smooth**: Toggle B1.5 to switch the quadrature between a staircase waveform (good for stepped modulation, sample-and-hold textures) and a smooth sine approximation (good for continuous modulation).
 6. **Combined clocking**: Use the quadrature outputs as slow modulation while I2 handles fast clock division — the two systems share P1.1 for correlated rates but operate independently.
 7. **Trill as audio**: At high P1.1 settings the trill enters audio range. Patch O5 to a mixer for crude but characterful FM synthesis directly from DROID.
+
+---
+
+## droid-zularic-repetitor.ini
+
+A 3-bank rhythmic gate generator inspired by the Noise Engineering Zularic Repetitor and Multi Repetitor modules. Generates 4 simultaneous gate outputs (mother + 3 children) from a library of world music rhythms, algorithmic numeric patterns, and Euclidean rhythms. Three banks selectable via P2.1: Zularic (8 stored patterns from African and world music traditions), Numeric Repetitor (2 algorithmically-derived 16-step patterns), and Euclidean (variable-density rhythms with 4 phase-offset outputs).
+
+### Hardware
+
+2 controllers: p2b8, p2b8
+
+### Inputs
+
+| Jack | Signal | Notes |
+|------|--------|-------|
+| I1 | Beat (clock) | Normaled to internal LFO (rate set by P1.1) |
+| I2 | Measure (reset) | Combined with B1.2 button |
+
+### Outputs
+
+| Jack | Signal |
+|------|--------|
+| O1 | Mother gate (Row 1) |
+| O2 | Child 1 gate (Row 2) |
+| O3 | Child 2 gate (Row 3) |
+| O4 | Child 3 gate (Row 4) |
+
+### Controls
+
+**Controller 1 (p2b8) — Transport & Pattern**
+
+| Control | Function |
+|---------|----------|
+| P1.1 | Clock rate (internal LFO speed) |
+| P1.2 | Pattern select (8 notched positions — function depends on bank) |
+| B1.1 | Run/Stop (LED = running) |
+| B1.2 | Reset (momentary) |
+| L1.4-L1.6 | Pattern number indicator (3-bit binary) |
+
+**Controller 2 (p2b8) — Bank & Display**
+
+| Control | Function |
+|---------|----------|
+| P2.1 | Bank select (3 positions: ZR / NR / Euclidean) |
+| L2.1-L2.4 | Beat indicator LEDs (Mother, Child 1, Child 2, Child 3 — flash on gate) |
+| L2.5-L2.6 | Bank indicator (off/off = ZR, on/off = NR, on/on = Euclidean) |
+
+### Banks
+
+**Bank 1: Zularic (ZR)** — 8 stored patterns, P1.2 selects 1–8
+
+Patterns extracted from the Noise Engineering Zularic Repetitor manual. Each pattern has 4 rows: a mother rhythm and 3 children derived from it. Patterns 1–4 are Old World (12-step, 12/8 feel — African and Middle Eastern rhythms). Patterns 5–8 are New World (16-step, 4/4 feel — Funk and Rock derived).
+
+| Position | Origin | Steps | Character |
+|----------|--------|-------|-----------|
+| 1 | Old World 1 | 12 | Dense polyrhythmic (26 beats) |
+| 2 | Old World 3 | 12 | Medium density (22 beats) |
+| 3 | Old World 5 | 12 | Very dense (27 beats) |
+| 4 | Old World 6 | 12 | Sparse (18 beats) |
+| 5 | New World 7 | 16 | Medium funk (24 beats) |
+| 6 | New World 8 | 16 | Dense funk (29 beats) |
+| 7 | New World 9 | 16 | Very dense (33 beats) |
+| 8 | New World 10 | 16 | Medium groove (28 beats) |
+
+The 12-step patterns create a 12/8 compound time feel; the 16-step patterns play in straight 4/4. The page-flip mechanism handles this automatically — the `_HALF_LEN` cable switches between 6 (for 12-step) and 8 (for 16-step) based on the selected pattern.
+
+**Bank 2: Numeric Repetitor (NR)** — 2 stored patterns, P1.2 positions 1–4 = NR1, 5–8 = NR2
+
+Algorithmically curated 16-step patterns from the Multi Repetitor's Numeric bank. Each mother rhythm was selected from 65,536 possible 16-step patterns using the criteria: fewer than 8 beats per measure, balanced density across all rotations. Children are derived via binary multiplication.
+
+| Selection | Mother Pattern | Beats | Character |
+|-----------|---------------|-------|-----------|
+| NR1 | `X...X...X...X...` | 4 | Four on the floor — universal dance rhythm |
+| NR13 | `X..X..X.X..X..X.` | 6 | Triplet feel — 3+3+2+3+3+2 grouping |
+
+NR1's children thin out progressively: R2 has 4 beats offset by 2 steps, R3 has 2 beats (downbeat + midpoint), R4 has only the downbeat. NR13's children maintain the triplet feel with increasing sparsity.
+
+**Bank 3: Euclidean** — Algorithmic, P1.2 controls beat density
+
+Uses DROID's native `[euklid]` circuit to generate Euclidean rhythms in real time — no pattern storage needed. The 8 pot positions map to beat counts: 1, 2, 3, 5, 7, 9, 11, 13 beats distributed as evenly as possible across 16 steps.
+
+All 4 outputs use the same beat count but with phase offsets for polyrhythmic interaction:
+
+| Output | Offset | Effect |
+|--------|--------|--------|
+| O1 (Mother) | 0 | Base Euclidean pattern |
+| O2 (Child 1) | 3 | Shifted by 3 steps |
+| O3 (Child 2) | 7 | Nearly half-rotation |
+| O4 (Child 3) | 11 | Counter-phase |
+
+At low beat counts (1–3), the offsets create widely spaced trigger cascades. At higher counts (9–13), the four outputs interlock into dense polyrhythmic textures where beats fill in the gaps between each other.
+
+### Architecture
+
+The patch uses a page-flip mechanism to handle patterns longer than 8 steps (DROID's `[sequencer]` maximum). Two 8-step sequencers per row are clocked alternately via a `[clocktool]` divider and `[flipflop]`:
+
+```
+_CLOCK → [clocktool] ÷ _HALF_LEN → [flipflop] → _SEQ_PAGE
+                                                    │
+              Page A clock ← _CLOCK * (1 - page)   │
+              Page B clock ← _CLOCK * page ─────────┘
+```
+
+Pattern selection uses 8-input `[switch]` circuits (one per row per page half), and page merge switches combine the two halves. A final bank mux layer (3-input switches) selects between ZR, NR, and Euclidean outputs.
+
+Total: 138 circuits, ~9.5 KB estimated RAM (within 10 KB budget).
+
+### Usage Tips
+
+1. **Quick start**: Leave inputs unpatched, press B1.1 to start. Turn P1.1 for tempo, P1.2 for pattern. Patch O1–O4 to four different drum/percussion modules.
+2. **Bank exploration**: Turn P2.1 to switch banks. ZR for organic world rhythms, NR for precise algorithmic patterns, Euclidean for evenly-spaced geometric rhythms. Watch L2.5/L2.6 for current bank.
+3. **12/8 vs 4/4**: ZR patterns 1–4 are 12-step (compound time). Use these with a clock at dotted-eighth speed for authentic 12/8 grooves. Patterns 5–8 are 16-step straight time.
+4. **Euclidean density sweep**: In Euclidean bank, slowly turn P1.2 from left to right during performance. The rhythm builds from a single downbeat (1 beat) through sparse polyrhythm (3–5 beats) to dense interlocking patterns (11–13 beats).
+5. **Phase-offset polyrhythm**: In Euclidean mode with 5 or 7 beats, the four phase-offset outputs create complex interlocking patterns. Patch each to a different percussion sound for instant polyrhythmic drumming.
+6. **External clock**: Patch a clock to I1 for tempo sync. Patch a reset/downbeat trigger to I2 to align phrase boundaries with your master sequencer.
+7. **Selective gating**: Use only O1 (mother) for the main rhythm and patch O2–O4 through VCAs or a bernoulli gate for occasional ghost notes and fills.
+8. **Four on the floor anchor**: Select NR bank, positions 1–4 (NR1). O1 gives a solid `X...X...X...X...` kick pattern while O2–O4 provide progressively sparser complementary rhythms — instant techno foundation.
