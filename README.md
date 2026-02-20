@@ -40,6 +40,7 @@ Ports of algorithms from the Expert Sleepers disting NT to DROID hardware.
 |-------|-------------|-------------|
 | [droid-bouncing-ball.ini](droid-bouncing-ball.ini) | Bouncing ball trigger generator — a decaying envelope inversely controls LFO speed, producing accelerating triggers that fade like a dropped ball. | p2b8 |
 | [droid-maths-classics.ini](droid-maths-classics.ini) | Five Make Noise MATHS classic patches in one: quadrature LFO, self-modulating arcade trill, voltage-controlled slew, pulse delay, and clock divider. | p2b8 |
+| [droid-cv-recorder.ini](droid-cv-recorder.ini) | Dual-channel CV recorder / looper — record knob movements and play back as loops or one-shots with variable speed, reverse, scrub, and SD card save/load. Inspired by Shakmat Bishop's Miscellany. | p2b8 p2b8 |
 
 ## TB-303 Pattern Library
 

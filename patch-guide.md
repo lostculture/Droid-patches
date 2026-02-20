@@ -18,6 +18,7 @@
 | `droid-maths-classics.ini` | Multi-function utility: quadrature LFO, arcade trill, VC slew, pulse delay, clock divider |
 | `droid-zularic-repetitor.ini` | Multi Repetitor — 3-bank rhythmic gate generator (ZR / Numeric / Euclidean) |
 | `droid-mi-grids.ini` | MI Grids clone — topographic drum sequencer with XY morphing, density, and chaos |
+| `droid-cv-recorder.ini` | Dual-channel CV recorder / looper (inspired by Bishop's Miscellany) |
 
 ---
 
@@ -912,3 +913,113 @@ The patch uses 79 circuits (~6.3 KB) organized in 10 sections:
 ### Pattern Data Credits
 
 Pattern data extracted from Mutable Instruments Grids by Emilie Gillet, licensed under GPL v3+. The 4 corner nodes (0, 4, 20, 24) from the original 5x5 topographic map provide the rhythmic material. 16 steps per channel extracted from 32-byte patterns using max-pair reduction to capture both even and odd-index values.
+
+---
+
+## droid-cv-recorder.ini
+
+A dual-channel CV recorder / looper inspired by Shakmat's Bishop's Miscellany. Record knob movements to tape and play them back as loops or one-shot sequences. Features variable playback speed, reverse, scrub, pause, and SD card save/load. Both channels share transport and playback controls but record independently.
+
+Uses the DROID `[recorder]` circuit (1,712 bytes RAM each) which provides full transport controls, clock-synced recording, and SD card persistence. Two `[recorder]` instances share the same tape memory pool.
+
+### Hardware
+
+2 controllers: p2b8, p2b8
+
+### Inputs
+
+| Jack | Signal | Notes |
+|------|--------|-------|
+| I1 | Clock | Normaled to internal LFO (rate set by P1.1) |
+| I2 | Play trigger | Starts playback on both channels (combine with B1.5) |
+
+### Outputs
+
+| Jack | Signal |
+|------|--------|
+| O1 | Ch1 CV out (recorded knob movement) |
+| O2 | Ch2 CV out |
+| O3 | Ch1 gate out |
+| O4 | Ch2 gate out |
+| O5 | Clock thru (gated by Run/Stop) |
+
+### Controls
+
+**Controller 1 (p2b8) — Transport & Speed**
+
+| Control | Function |
+|---------|----------|
+| P1.1 | Clock rate (internal LFO speed, 0.5-8.5 Hz) |
+| P1.2 | Playback speed (0-2x, center = 1x) / Scrub position (when scrub enabled) |
+| B1.1 | Run/Stop (LED = running, default on) |
+| B1.2 | Reset clock phase (momentary) |
+| B1.3 | Record Ch1 (LED = recording, handled by recorder) |
+| B1.4 | Record Ch2 (LED = recording, handled by recorder) |
+| B1.5 | Play (LED = Ch1 playing, handled by recorder) |
+| B1.6 | Stop (LED = Ch2 playing, stops recording and playback) |
+| B1.7 | Loop on/off (LED = loop mode active) |
+| B1.8 | Reverse on/off (LED = reverse playback) |
+
+**Controller 2 (p2b8) — Recording & File Management**
+
+| Control | Function |
+|---------|----------|
+| P2.1 | Ch1 recording knob — turn while recording to capture CV movement |
+| P2.2 | Ch2 recording knob |
+| B2.1 | Pause (LED = paused, freezes playback position) |
+| B2.2 | Scrub enable (LED = on, P1.2 controls tape position instead of speed) |
+| B2.3 | Save to SD card (momentary, LED flash) |
+| B2.4 | Load from SD card (momentary, LED flash) |
+| B2.5 | File number select (cycles 0-9, LED brightness shows position) |
+| L2.6 | Tape overflow warning (lights if either channel exceeds tape memory) |
+
+### Recording Workflow
+
+1. Press **B1.1** (Run/Stop) to start the clock — LED lights, default is on at startup
+2. Press **B1.3** (Record Ch1) — L1.3 lights, recording begins
+3. **Turn P2.1** — the knob's CV (0-1V) is captured to tape, one sample per clock tick
+4. Press **B1.3** again (or B1.6 Stop) — recording stops
+5. Press **B1.5** (Play) — recorded CV loops out on O1, L1.5 lights
+6. Adjust **P1.2** for playback speed (center = normal, CW = 2x faster)
+7. Toggle **B1.8** for reverse playback
+8. Toggle **B1.7** for loop on/off (off = one-shot)
+9. Press **B2.3** to save to SD card; **B2.4** to load
+
+### One-Shot Trigger Mode
+
+When Loop is OFF (B1.7), sending a trigger to **I2** (or pressing B1.5) plays the recording once from start to end, then stops. This is the "via trigger" playback mode — useful for firing recorded CV gestures from a sequencer or foot pedal.
+
+### Scrub Mode
+
+Toggle **B2.2** to enable scrub. Now P1.2 controls the tape position directly (0 = start, 1 = end) instead of playback speed. Turn the pot to manually scrub through the recording. Useful for finding specific moments or for manual "scratching" performance effects.
+
+### File Management
+
+Press **B2.5** to cycle through file numbers 0-9 (LED brightness indicates position). Ch1 saves to files 0-9, Ch2 saves to files 10-19 (offset by 10 to prevent conflicts). Press **B2.3** to save both channels; **B2.4** to load. Files persist on the SD card as `tape####.bin`.
+
+### Architecture
+
+20 circuits, ~4.8 KB estimated RAM:
+
+| Section | Circuits | Purpose |
+|---------|----------|---------|
+| Transport | 5 | LFO clock, Run/Stop, Reset, gated clock, clock thru |
+| CV Sources | 2 | Pot helpers for recording knobs |
+| Shared Controls | 5 | Play trigger merge, Loop, Reverse, Pause, Scrub toggles |
+| Playback Speed | 2 | Speed scaling (0-2x) and reverse negation |
+| Save/Load/File | 3 | Save, Load buttons with LED flash, 10-state file selector |
+| Recorder x2 | 2 | Independent CV/gate recorders sharing transport state |
+| LED Indicators | 1 | Overflow warning merge |
+
+### Usage Tips
+
+1. **Basic recording**: Start the clock (B1.1), hit record (B1.3), wiggle the knob (P2.1), stop recording, press play (B1.5). Instant CV loop on O1.
+2. **Dual-channel**: Record both channels independently. Ch1 records from P2.1, Ch2 from P2.2. Both play back simultaneously with shared speed/reverse/loop controls.
+3. **Speed performance**: Sweep P1.2 during playback for varispeed effects. Full CCW = frozen, center = normal, full CW = double speed. Toggle B1.8 for instant reverse.
+4. **One-shot riffs**: Turn loop off (B1.7), patch a trigger source to I2. Each trigger plays the recorded CV gesture once — instant "riff on demand" from any trigger source.
+5. **Scrub DJ mode**: Enable scrub (B2.2), then manually position the tape head with P1.2. Great for finding sweet spots in a recording or for performative scratching.
+6. **Pause for freeze**: Toggle B2.1 to freeze playback at the current position. The CV output holds its current value. Unpause to resume from where you left off.
+7. **SD card presets**: Save favorite recordings to different file slots (B2.5 cycles 0-9). Load them back anytime — great for a library of pre-recorded CV gestures.
+8. **External clock sync**: Patch a clock to I1 for tempo-synced recording. The recorder captures one CV sample per clock tick, so the playback stays in time with your system.
+9. **Pair with quantizer**: Patch O1 through a `[minifonion]` for pitch-quantized CV playback. Record free-form knob movements, play back as musical melodies.
+10. **Gate outputs**: O3/O4 output gates recorded alongside the CV. With `gatein1 = 1`, the gate is always high during recording, producing a continuous gate during playback. Useful for driving VCAs or envelopes.
