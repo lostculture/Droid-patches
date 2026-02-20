@@ -17,6 +17,7 @@
 | `droid-bouncing-ball.ini` | Classic bouncing ball trigger generator with decay and gravity |
 | `droid-maths-classics.ini` | Multi-function utility: quadrature LFO, arcade trill, VC slew, pulse delay, clock divider |
 | `droid-zularic-repetitor.ini` | Multi Repetitor — 3-bank rhythmic gate generator (ZR / Numeric / Euclidean) |
+| `droid-mi-grids.ini` | MI Grids clone — topographic drum sequencer with XY morphing, density, and chaos |
 
 ---
 
@@ -817,3 +818,97 @@ Total: 138 circuits, ~9.5 KB estimated RAM (within 10 KB budget).
 6. **External clock**: Patch a clock to I1 for tempo sync. Patch a reset/downbeat trigger to I2 to align phrase boundaries with your master sequencer.
 7. **Selective gating**: Use only O1 (mother) for the main rhythm and patch O2–O4 through VCAs or a bernoulli gate for occasional ghost notes and fills.
 8. **Four on the floor anchor**: Select NR bank, positions 1–4 (NR1). O1 gives a solid `X...X...X...X...` kick pattern while O2–O4 provide progressively sparser complementary rhythms — instant techno foundation.
+
+---
+
+## droid-mi-grids.ini
+
+A DROID clone of Mutable Instruments Grids, the "topographic drum sequencer." Generates rhythmic gate patterns for 3 drum channels (BD, SD, HH) that morph continuously across an X/Y map of rhythmic styles, with density control, accent outputs, and per-step chaos. Pattern data from the original Grids firmware by Emilie Gillet (GPL v3+).
+
+### How It Works
+
+Grids stores rhythmic patterns as per-step "level" values (0-255) across a 2D map. This implementation uses the 4 corner nodes from the original 5x5 grid, giving a simplified but musically effective 2x2 map:
+
+| | X=0 (Left) | X=1 (Right) |
+|---|---|---|
+| **Y=0 (Top)** | Node 0: Four-on-the-floor, clean backbeat, steady 8ths | Node 4: Busy rolling, backbeat + fills, active HH |
+| **Y=1 (Bottom)** | Node 20: Syncopated Afro-Cuban, polyrhythmic, sparse HH | Node 24: Dense fine-resolution, sparse w/ rolls, rapid-fire HH |
+
+The X and Y pots continuously interpolate between these four corners using bilinear crossfading. Each step produces a "level" for each channel. The density knob sets a threshold — steps whose level exceeds (1 - density) fire a gate. At low density only the strongest beats fire; at full density nearly everything triggers.
+
+Accents fire when a step's level exceeds 0.753 (192/255), matching the original Grids behavior. Chaos adds a random offset (+/-15%) to each step's level, introducing variation.
+
+### Hardware
+
+2 controllers: p2b8, p2b8
+
+### Inputs
+
+| Jack | Signal | Notes |
+|------|--------|-------|
+| I1 | Clock | Normaled to internal LFO (rate set by P1.1) |
+| I2 | Reset | Returns to step 1 |
+
+### Outputs
+
+| Jack | Signal |
+|------|--------|
+| O1 | BD gate |
+| O2 | SD gate |
+| O3 | HH gate |
+| O4 | BD accent |
+| O5 | SD accent |
+| O6 | HH accent |
+| O7 | Clock thru |
+
+### Controls
+
+**Controller 1 (p2b8) — Transport & Map**
+
+| Control | Function |
+|---------|----------|
+| P1.1 | Clock rate (internal LFO speed) |
+| P1.2 | Map X — morph left/right between rhythmic styles |
+| B1.1 | Run/Stop (LED = running) |
+| B1.2 | Reset (momentary) |
+| B1.3 | Chaos on/off (LED = active) |
+
+**Controller 2 (p2b8) — Map Y, Density & Mutes**
+
+| Control | Function |
+|---------|----------|
+| P2.1 | Map Y — morph top/bottom between rhythmic styles |
+| P2.2 | Density (0 = sparse, only strongest beats; 1 = full, nearly all steps fire) |
+| B2.1 | BD mute (LED on = unmuted) |
+| B2.2 | SD mute (LED on = unmuted) |
+| B2.3 | HH mute (LED on = unmuted) |
+
+### Architecture
+
+The patch uses 79 circuits (~6.3 KB) organized in 10 sections:
+
+1. **Transport** — Internal LFO normaled to I1, run/stop, reset merge
+2. **Page-flip** — 16-step sequencing via 2x8-step pages (clocktool /8 + flipflop)
+3. **Pattern data** — 24 sequencers (4 nodes x 3 channels x 2 pages) storing level values
+4. **Page merge** — 12 switches combining page A/B into one output per node/channel
+5. **Bilinear interpolation** — 9 crossfaders (3 per channel: top row, bottom row, vertical)
+6. **Chaos** — 1 random generator + 3 copies adding offset when enabled
+7. **Density threshold** — 3 compares (level > 1-density = gate)
+8. **Accent threshold** — 3 compares (level > 0.753 = accent)
+9. **Mutes & outputs** — 3 mute toggles + 6 output copies
+10. **Controls** — 3 pots (Map X, Map Y, Density)
+
+### Usage Tips
+
+1. **Quick start**: Patch O1-O3 to three drum modules (kick, snare, hi-hat). Press B1.1 to start. Turn P1.1 for tempo. Both X and Y pots at noon gives a blend of all four corner patterns.
+2. **Explore the map**: Sweep P1.2 (X) and P2.1 (Y) slowly. Top-left is classic four-on-the-floor rock. Top-right gets busy and rolling. Bottom-left goes Afro-Cuban syncopated. Bottom-right is dense and rapid-fire.
+3. **Density as build-up**: Start with P2.2 low — only the strongest beats fire. Gradually increase for fills and build-ups. At full density, nearly every step triggers.
+4. **Accent for dynamics**: Patch O4-O6 to accent/velocity inputs on your drum modules for dynamic variation. Accented steps are the strongest beats in each pattern.
+5. **Chaos for humanization**: Toggle B1.3 to add +/-15% random variation to each step's level. This pushes some borderline steps over or under the density threshold, creating subtle per-repeat variation.
+6. **Channel mutes for arrangement**: Use B2.1-B2.3 to drop channels in and out during performance. All three start unmuted (LED on).
+7. **External clock**: Patch your master clock to I1 and a reset/downbeat to I2 for tempo sync. O7 passes the gated clock through for chaining.
+8. **Pair with accent envelopes**: Route accent outputs through separate envelope generators with shorter decay for snappy accented hits alongside longer-decay normal gates.
+
+### Pattern Data Credits
+
+Pattern data extracted from Mutable Instruments Grids by Emilie Gillet, licensed under GPL v3+. The 4 corner nodes (0, 4, 20, 24) from the original 5x5 topographic map provide the rhythmic material. 16 steps per channel extracted from 32-byte patterns using max-pair reduction to capture both even and odd-index values.

@@ -18,6 +18,7 @@ A collection of patches for the [DROID](https://shop.dermannmitdermaschine.de) m
 | Patch | Description | Controllers |
 |-------|-------------|-------------|
 | [droid-zularic-repetitor.ini](droid-zularic-repetitor.ini) | Multi Repetitor — 3-bank rhythmic gate generator with 4 outputs. Bank 1 (ZR): 8 Zularic patterns (African & world rhythms). Bank 2 (NR): 2 Numeric Repetitor patterns (algorithmic). Bank 3: Euclidean rhythms (1-13 beats, 4 phase-offset outputs). | p2b8 p2b8 |
+| [droid-mi-grids.ini](droid-mi-grids.ini) | MI Grids clone — topographic drum sequencer. 3-channel gate/accent generator with XY map morphing across 4 rhythmic styles, continuous density control, and per-step chaos. Pattern data from Mutable Instruments Grids. | p2b8 p2b8 |
 
 ### Disting NT Ports
 
