@@ -1,0 +1,69 @@
+# ──────────────────────────────────────────────────────────────────
+# Example: Modulation Rack
+# ──────────────────────────────────────────────────────────────────
+#
+# A modulation-focused utility patch:
+#   - Quadrature LFO providing 4 phase-shifted modulation signals
+#   - Random voltage source (stepped + smooth)
+#   - Crossfader to blend LFO and random
+#   - Attenuverter on the output for level/polarity control
+#
+# Hardware: 1x p2b8 controller, DROID master I/O
+#
+# Outputs:
+#   O1: Quadrature LFO 0°
+#   O2: Quadrature LFO 90°
+#   O3: Blended random/LFO (crossfaded)
+#   O4: Attenuated/inverted modulation
+#
+# ──────────────────────────────────────────────────────────────────
+
+name: "Modulation Rack"
+description: "Quad LFO + random + crossfader + attenuverter"
+
+controllers:
+  - p2b8
+
+tools:
+  # ── Quadrature LFO ─────────────────────────────
+  - tool: quad_lfo
+    name: qlfo
+    outputs:
+      phase_0: O1
+      phase_90: O2
+      phase_180: _LFO_180
+      phase_270: _LFO_270
+    controls:
+      rate: P1.1
+
+  # ── Random Voltage Source ──────────────────────
+  - tool: random_voltage
+    name: rand
+    inputs:
+      trigger: I1
+    outputs:
+      stepped: _RAND_STEP
+      smooth: _RAND_SMOOTH
+    controls:
+      rate: P1.2
+
+  # ── Crossfader: blend LFO 180° with smooth random
+  - tool: crossfader
+    name: xfade
+    inputs:
+      input1: _LFO_180
+      input2: _RAND_SMOOTH
+    outputs:
+      output: O3
+    controls:
+      mix: B1.5
+
+  # ── Attenuverter on stepped random ─────────────
+  - tool: attenuverter
+    name: atten
+    inputs:
+      input: _RAND_STEP
+    outputs:
+      output: O4
+    controls:
+      amount: P1.2

@@ -1,0 +1,79 @@
+# ──────────────────────────────────────────────────────────────────
+# Example: CV Utility Rack
+# ──────────────────────────────────────────────────────────────────
+#
+# A general-purpose CV utility patch combining:
+#   - Clock divider for timing
+#   - Sample & Hold driven by divided clock
+#   - Slew limiter to smooth the S&H output
+#   - Quantizer to snap to musical scale
+#   - Comparator for gate generation
+#
+# Hardware: 1x p2b8 controller, DROID master I/O
+#
+# Signal flow:
+#   I1 (clock) → Clock Divider → S&H trigger
+#   I2 (CV)    → S&H → Slew → Quantizer → O1 (pitch)
+#   I3 (CV)    → Comparator → O3 (gate)
+#
+# ──────────────────────────────────────────────────────────────────
+
+name: "CV Utility Rack"
+description: "Clock divider + S&H + slew + quantizer + comparator"
+
+controllers:
+  - p2b8
+
+tools:
+  # ── Clock Section ──────────────────────────────
+  - tool: clock_divider
+    name: clkdiv
+    inputs:
+      clock: I1
+    outputs:
+      output: _DIVIDED_CLK
+    controls:
+      ratio: P1.1
+      reset_btn: B1.1
+      reset_led: L1.1
+
+  # ── Sample & Hold ──────────────────────────────
+  - tool: sample_hold
+    name: sh
+    inputs:
+      signal: I2
+      trigger: _DIVIDED_CLK
+    outputs:
+      output: _SH_OUT
+
+  # ── Slew Limiter (smooth the steps) ────────────
+  - tool: slew_limiter
+    name: glide
+    inputs:
+      input: _SH_OUT
+    outputs:
+      output: _SLEWED
+    controls:
+      slew: P1.2
+
+  # ── Quantizer ──────────────────────────────────
+  - tool: quantizer
+    name: quant
+    inputs:
+      input: _SLEWED
+    outputs:
+      output: O1
+    controls:
+      root: B1.3
+      scale: B1.4
+
+  # ── Comparator (threshold gate) ────────────────
+  - tool: comparator
+    name: comp
+    inputs:
+      input: I3
+    outputs:
+      gate: O3
+      inverted: O4
+    controls:
+      threshold: P1.2
