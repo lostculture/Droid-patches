@@ -1023,3 +1023,160 @@ Press **B2.5** to cycle through file numbers 0-9 (LED brightness indicates posit
 8. **External clock sync**: Patch a clock to I1 for tempo-synced recording. The recorder captures one CV sample per clock tick, so the playback stays in time with your system.
 9. **Pair with quantizer**: Patch O1 through a `[minifonion]` for pitch-quantized CV playback. Record free-form knob movements, play back as musical melodies.
 10. **Gate outputs**: O3/O4 output gates recorded alongside the CV. With `gatein1 = 1`, the gate is always high during recording, producing a continuous gate during playback. Useful for driving VCAs or envelopes.
+
+
+---
+
+## droid-polimaths.ini
+
+An 8-channel CV event generator emulating the Make Noise PoliMATHS. Each channel runs an independent Rise-Fall envelope with a superimposed oscillator (LFO to audio rate). Four activation modes determine which channels fire on each trigger input. Spread modulation applies staggered parameter offsets across channels for automatic timbral differentiation. Two output modes: Internal Osc (envelope × oscillator CV) and External Osc (pitch CV for driving external VCOs).
+
+### Hardware
+
+5 controllers: p2b8, p2b8, p10, p8s8, x7
+
+### Inputs
+
+| Jack | Signal | Notes |
+|------|--------|-------|
+| I1 | Activate | Clock or gate — triggers channel activations |
+| I2 | Reset | Returns all channels to idle |
+| I3 | Span CV | External channel selection modulation |
+| I4 | Spread CV | External spread amount modulation |
+
+### Outputs
+
+**Internal Osc mode (default — B1.7 off):**
+
+| Jack | Signal |
+|------|--------|
+| O1–O8 | Channel 1–8 envelope × oscillator CV |
+| G1–G8 | Channel 1–8 activity gates (via x7) |
+
+**External Osc mode (B1.7 on):**
+
+| Jack | Signal |
+|------|--------|
+| O1–O8 | Channel 1–8 pitch CV (1V/oct for external VCOs) |
+| G1–G8 | Channel 1–8 activation gates |
+
+### Controls
+
+**Controller 1 (p2b8) — Transport & Mode**
+
+| Control | Function |
+|---------|----------|
+| P1.1 | Span (channel select for Ch.Index; round step position for Round; parallel divisions for Parallel) |
+| P1.2 | Spread (center = none; CW = right channels offset up; CCW = left channels offset up) |
+| B1.1 | Run/Stop (LED = running) |
+| B1.2 | Reset (momentary) |
+| B1.3 | Mode (4 states: Ch.Index / Round / Parallel / Binary) |
+| B1.4 | Cycle on/off (LED = active) |
+| B1.5 | Cycle mode (2 states: All / Follow the Leader) |
+| B1.6 | Osc Bias (2 states: Unipolar / Bipolar) |
+| B1.7 | Output mode (2 states: Internal Osc / External Osc) |
+| B1.8 | *unused* |
+
+**Controller 2 (p2b8) — Curve & Manual Triggers**
+
+| Control | Function |
+|---------|----------|
+| P2.1 | Curve (envelope shape: full CCW = logarithmic; noon = linear; full CW = exponential) |
+| P2.2 | Osc Depth (oscillation mix: 0 = envelope only; full = full oscillator depth) |
+| B2.1–B2.8 | Manual channel triggers Ch 1–8 (momentary) |
+| L2.1–L2.8 | Channel activity LEDs (brightness tracks envelope level) |
+
+**Controller 3 (p10) — Parameters & Spread Depths**
+
+| Control | Function |
+|---------|----------|
+| P3.1 | Rise (envelope attack time) |
+| P3.2 | Fall (envelope release time) |
+| P3.3 | Strength (envelope peak level) |
+| P3.4 | Rate (oscillator frequency) |
+| P3.5 | Shape (oscillator waveshape) |
+| P3.6 | Rise Spread Depth |
+| P3.7 | Fall Spread Depth |
+| P3.8 | Strength Spread Depth |
+| P3.9 | Rate Spread Depth |
+| P3.10 | Osc Spread Depth |
+
+**Controller 4 (p8s8) — Per-Channel**
+
+| Control | Function |
+|---------|----------|
+| P4.1–P4.8 | Channel 1–8 level trim (attenuate individual channel output) |
+| S4.1–S4.8 | Channel 1–8 mute switches |
+
+**Controller 5 (x7) — Gate Expander**
+
+| Jack | Function |
+|------|----------|
+| G1–G8 | Channel 1–8 gate outputs |
+
+### Activation Modes
+
+Four modes select which channels are activated on each trigger at I1. Cycle through with **B1.3**:
+
+**Ch.Index** — Span pot (P1.1 + I3 CV) selects a single channel. Only that channel fires. Useful for playing channels as individual voice sources via CV.
+
+**Round** — A sequencer steps through channels 1→2→...→8→1. Each trigger advances to the next channel. Span pot sets the starting position within the sequence.
+
+**Parallel** — All channels fire simultaneously. Span pot selects a clock division count (1–8) so each trigger fires a different number of channels at once.
+
+**Binary** — A binary counter advances on each trigger (0–255). The 8-bit output maps to 8 channel gates — each channel fires when its corresponding bit is set. Creates rhythmic gate patterns that cycle through all 256 binary states.
+
+### Cycle Modes
+
+When **Cycle** is on (B1.4), channels re-trigger automatically after their envelope completes. Two sub-modes via **B1.5**:
+
+**All** — All active channels cycle independently. Each channel detects its own envelope end-of-cycle and retriggers itself, regardless of other channels.
+
+**Follow the Leader** — Channels form a chain. When channel N's envelope reaches zero, it triggers channel N+1. Channel 8 wraps back to channel 1. This creates a cascading ripple effect: trigger channel 1 once and the envelope passes sequentially through all 8 channels indefinitely.
+
+### Spread
+
+Spread distributes parameter offsets across the 8 channels. The amount of offset applied to each channel is proportional to its position and the spread depth knobs (P3.6–P3.10).
+
+- **P1.2 center**: no spread — all channels receive identical parameters
+- **P1.2 CW**: right-side channels (5–8) get higher offsets; left-side (1–4) get lower
+- **P1.2 CCW**: reversed — left channels get higher offsets
+- **P3.6–P3.10**: individual depth controls per parameter (Rise, Fall, Strength, Rate, Osc)
+- **I4**: external CV modulates spread amount
+
+When spread is applied, each channel's Rise, Fall, Strength, oscillator Rate, and oscillator depth all shift by a scaled offset, making each channel's envelope slightly different. At maximum spread depths, channel 8 may have substantially longer rise times, higher strength, and faster oscillator than channel 1.
+
+### Architecture
+
+194 circuits across 15 functional sections.
+
+| Section | Circuits |
+|---------|----------|
+| Transport | 6 |
+| Mode/cycle buttons | 9 |
+| Spread pre-compute | 1 |
+| Channel Index | 17 |
+| Round | 19 |
+| Parallel | 15 |
+| Binary counter | 23 |
+| Mode mux | 9 |
+| Trigger merge | 9 |
+| Envelopes | 8 |
+| Oscillators + shape | 16 |
+| Output mixing + routing | 24 |
+| Gate outputs | 16 |
+| Follow the Leader | 24 |
+| LEDs + channel index | 9 |
+
+### Usage Tips
+
+1. **Instant polyrhythm**: Select Parallel mode (B1.3 state 3). Sweep P1.1 to step through different numbers of simultaneously-firing channels. Patch O1–O8 to separate sound modules — each trigger fires a changing cluster of channels.
+2. **Cascading envelopes**: Select Ch.Index mode (B1.3 state 1). Enable Cycle (B1.4) and set Follow the Leader (B1.5 state 2). Trigger channel 1 (B2.1) — the envelope cascades 1→2→...→8→1 indefinitely. Adjust Rise/Fall (P3.1/P3.2) for cascade speed.
+3. **Spread for timbral variation**: Set all spread depth knobs (P3.6–P3.10) to noon. Sweep P1.2 from center outward. The channels develop increasingly differentiated envelope shapes — channel 1 gets short/quiet, channel 8 gets long/loud (or vice versa).
+4. **Binary counter rhythms**: Select Binary mode (B1.3 state 4). Connect a steady clock to I1. Each clock tick advances the binary counter — the 8 channel gates fire in a mathematically determined pattern cycling through 256 states before repeating.
+5. **External VCO pitch**: Enable External Osc mode (B1.7 on). O1–O8 now output pitch CVs. Patch to 8 VCOs and use G1–G8 to gate their VCAs. Each channel fires at a pitch determined by the Spread-modulated Rate and Strength values.
+6. **Voltage-controlled spread**: Patch a slow LFO or envelope to I4 (Spread CV). The spread distribution across channels slowly opens and closes, animating the timbral differences between channels.
+7. **Manual voice triggering**: B2.1–B2.8 manually trigger each channel regardless of the current activation mode. Use these for direct performance control — play individual channels like keys. Combine with Cycle modes for sustained ringing.
+8. **Mutes for arrangement**: S4.1–S4.8 mute individual channels. Drop and add channels during performance for dynamic arrangement. Level trim (P4.1–P4.8) balances output levels per channel before muting.
+9. **Oscillator as drone**: Set Rise and Fall long (P3.1/P3.2 full CW), enable Bipolar Osc (B1.6), increase Osc Depth (P2.2). Channels sustain long envelopes with the oscillator creating a continuous drone. Rate spread (P3.9) detunes channels apart.
+10. **CV-select specific channels**: Patch a sequencer CV to I3 (Span CV) in Ch.Index mode. The CV selects which channel fires on each trigger — instant CV-controlled channel addressing.
