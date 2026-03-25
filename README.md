@@ -34,6 +34,18 @@ Ports of algorithms from the Expert Sleepers disting NT to DROID hardware.
 | [droid-shift-register.ini](droid-shift-register.ini) | shift_register.lua | 6-stage CV shift register with optional feedback that loops stage 6 back to input for repeating patterns. | p2b8 |
 | [droid-sync-latch.ini](droid-sync-latch.ini) | sync_latch.lua | Defers transport start/stop to loop boundaries so slave sequencers only change state on musical downbeats. | p2b8 |
 
+### Bass Modulation Engines
+
+Genre-specific CV co-processors for bass sound design. Each receives a gate/pitch and outputs 8 CVs (pitch, filter, VCA, mod, resonance, extra, sub, gate) with sweet-spot-tuned controls. See [docs/bass-routing-guide.md](docs/bass-routing-guide.md) for suggested module patchings.
+
+| Patch | Genre | Description | Controllers |
+|-------|-------|-------------|-------------|
+| [droid-bass-liquid.ini](droid-bass-liquid.ini) | Liquid DnB | Slow evolving filter sweeps with breathing LFO, macro drift, and configurable sweep shape. Long sustained notes with organic movement. | p2b8 |
+| [droid-bass-acid.ini](droid-bass-acid.ini) | Acid/303 | TB-303-style modulation: fast filter decay, accent envelope with accumulation, pitch slide/portamento, high resonance. Pure modulation engine (separate from the tb303-acid sequencer). | p2b8 |
+| [droid-bass-dub.ini](droid-bass-dub.ini) | Dub/Reggae | Deep sub weight with minimal modulation. Near-static filter, optional pitch drop for weight, dub siren LFO, and subtle pressure breathing. | p2b8 |
+| [droid-bass-wobble.ini](droid-bass-wobble.ini) | Dubstep | Tempo-synced "wub wub" filter LFO with selectable rate divisions (half/quarter/eighth/sixteenth), dual-LFO growl mode, and sub-octave drop. | p2b8 |
+| [droid-bass-reese.ini](droid-bass-reese.ini) | Reese/DnB | Dual detuned pitch CVs for oscillator phasing/beating, configurable detune spread (subtle/classic/aggressive), DnB mode with rhythmic filter pulsing. | p2b8 |
+
 ### Utilities
 
 | Patch | Description | Controllers |
@@ -52,9 +64,23 @@ Ports of algorithms from the Expert Sleepers disting NT to DROID hardware.
 - [zr-patterns.json](zr-patterns.json) — 29 Zularic Repetitor patterns extracted from the [ZR manual](https://manuals.noiseengineering.us/zr/), including Old World (African/12-step) and New World (Funk/Rock/16-step) banks with 4 rows each (mother + 3 children).
 - [mr-patterns.json](mr-patterns.json) — 52 Multi Repetitor patterns extracted from the [MR manual](https://manuals.noiseengineering.us/mr/): 16 Numeric (algorithmic prime rhythms), 16 Zularic (world music), and 20 Euclidean (generalized Euclidean). All 16-step, 4 rows per pattern.
 
+## CV Tool Library
+
+A modular library of 38 reusable CV utility tools with a YAML-driven patch builder. Inspired by Doepfer A-100, Mutable Instruments, Befaco, Joranalogue, Music Thing Modular, and Noise Engineering.
+
+```bash
+python cv-tools/builder.py --list-tools          # see all 38 tools
+python cv-tools/builder.py config.yaml -o out.ini # build a patch
+```
+
+See [cv-tools/README.md](cv-tools/README.md) for full documentation and [cv-tools/CATALOG.md](cv-tools/CATALOG.md) for the complete Eurorack CV utility survey.
+
 ## Documentation
 
 - [patch-guide.md](patch-guide.md) — Detailed reference for all patches: hardware requirements, I/O mappings, control layouts, and usage tips
+- [cv-tools/README.md](cv-tools/README.md) — CV tool library documentation and builder usage
+- [cv-tools/CATALOG.md](cv-tools/CATALOG.md) — Complete Eurorack CV utility function survey
+- [docs/module-inventory.md](docs/module-inventory.md) — Full 152-module inventory from ModularGrid
 - [TB303 style acid patten generator.md](TB303%20style%20acid%20patten%20generator.md) — Design spec for the TB-303 patch
 
 ## License
