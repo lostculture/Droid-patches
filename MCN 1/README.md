@@ -6,6 +6,7 @@ machine with eight scenes.
 | File | What it is |
 |---|---|
 | `droid.ini` | The patch. Copy to the root of the DROID SD card. |
+| `gate-test.ini` | Diagnostic — blinks every G8 and X7 gate with no controllers or clock needed |
 | `design.md` | Full design: routing, control map, voice engines, scene system |
 | `overlay-print.pdf` | Printable controller overlay (A4 landscape) |
 | `routing-print.pdf` | Printable routing + audio path sheets |
@@ -51,6 +52,20 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 6. **B4.1**–**B4.8** switch scenes. Everything you change is stored into the
    current scene automatically — no save gesture. Long-press **B4.32** to reset
    the current scene.
+
+## If the gates do not fire
+
+Load `gate-test.ini` instead. It blinks G1–G12 on its own with no clock, no
+controllers and no button presses, so it separates a wiring problem from a patch
+problem. The header of that file lists what each outcome means.
+
+Neither expander is ever declared in a patch — only controllers are. A single
+G8's jacks are `G1`–`G8`; the X7's four gates follow at `G9`–`G12`. The X7 must
+be the first module in the chain.
+
+If the gates blink in the test but the main patch is quiet, it is almost always
+density: `P3.1` (drums) and `P3.9` (mangle) at zero means silence by design, and
+`B1.1` must be lit for the clock to run.
 
 ## Regenerate the diagrams
 
