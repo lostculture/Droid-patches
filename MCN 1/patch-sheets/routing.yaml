@@ -1,0 +1,188 @@
+title: "MCN Droid Performance Rack"
+subtitle: "3-voice groove machine — gates, CV and MIDI from one DROID"
+series: "MCN Droid Performance Rack"
+
+pages:
+  - title: "Gates, CV & MIDI Routing"
+    subtitle: "DROID master + X7 + G8 driving three voices"
+    description: ""
+    modules:
+      - id: joy
+        type: BLACK JOYSTICK 2
+        label: "→ I3/I4 + Multigrain"
+        pos: [0, 0]
+
+      - id: droid
+        type: DROID + X7 + G8
+        label: "5 controllers"
+        pos: [0, 2]
+
+      - id: ext
+        type: EXT CLOCK
+        label: "I1 clock · I2 reset"
+        pos: [0, 4]
+
+      - id: squid
+        type: SQUID SALMPLE
+        label: "G1-G4 kit · G5-G8 mangle"
+        pos: [2, 0]
+
+      - id: domino
+        type: DOMINO
+        label: "G10 gate · O1 pitch"
+        pos: [2, 2]
+
+      - id: mgrain
+        type: MULTIGRAIN
+        label: "G12 trig · joystick CV"
+        pos: [2, 3]
+
+      - id: dim
+        type: DIMENSION MK3
+        label: "MIDI ch.1 + CC"
+        pos: [2, 4]
+
+      - id: carbn
+        type: C4RBN
+        label: "O6 filter macro"
+        pos: [4, 1]
+
+      - id: fx
+        type: AURORA / FX AID
+        label: "O7 space macro"
+        pos: [4, 3]
+
+      - id: clockout
+        type: CLOCK OUT
+        label: "G9 → rack sync"
+        pos: [6, 2]
+
+    connections:
+      - from: joy
+        to: droid
+        signal: cv
+        label: "X/Y macro"
+      - from: joy
+        to: mgrain
+        signal: cv
+        label: "direct — not via DROID"
+      - from: ext
+        to: droid
+        signal: gate
+        label: "I1 / I2"
+      - from: droid
+        to: squid
+        signal: gate
+        label: "G1-G8"
+      - from: droid
+        to: domino
+        signal: gate
+        label: "G10"
+      - from: droid
+        to: mgrain
+        signal: trigger
+        label: "G12"
+      - from: droid
+        to: dim
+        signal: mod
+        label: "MIDI TRS"
+      - from: droid
+        to: carbn
+        signal: cv
+        label: "O6"
+      - from: droid
+        to: fx
+        signal: cv
+        label: "O7"
+      - from: droid
+        to: clockout
+        signal: gate
+        label: "G9"
+
+  - title: "Audio Path"
+    subtitle: "Three voices into the filter / FX chain"
+    description: ""
+    modules:
+      - id: squid
+        type: SQUID SALMPLE
+        label: "Drums + mangle"
+        pos: [0, 0]
+
+      - id: domino
+        type: DOMINO
+        label: "Bass"
+        pos: [0, 2]
+
+      - id: dim
+        type: DIMENSION MK3
+        label: "Lead (MIDI)"
+        pos: [0, 4]
+
+      - id: carbn
+        type: C4RBN
+        label: "SVF + saturation"
+        pos: [2, 2]
+
+      - id: toad
+        type: THE TOAD
+        label: "12-stage phaser"
+        pos: [2, 4]
+
+      - id: mgrain
+        type: MULTIGRAIN
+        label: "Granular texture"
+        pos: [2, 0]
+
+      - id: aikido
+        type: AIKIDO
+        label: "Quad VCA mix"
+        pos: [4, 2]
+
+      - id: fx
+        type: FX AID
+        label: "Delay / space"
+        pos: [4, 4]
+
+      - id: aurora
+        type: AURORA
+        label: "Spectral reverb"
+        pos: [4, 0]
+
+      - id: out
+        type: OUTPUT
+        label: "Main out"
+        pos: [6, 2]
+
+    connections:
+      - from: squid
+        to: mgrain
+        signal: audio
+        label: "mangle bus"
+      - from: squid
+        to: aikido
+        signal: audio
+        label: "kit"
+      - from: domino
+        to: carbn
+        signal: audio
+      - from: carbn
+        to: aikido
+        signal: audio
+      - from: dim
+        to: toad
+        signal: audio
+      - from: toad
+        to: fx
+        signal: audio
+      - from: mgrain
+        to: aurora
+        signal: audio
+      - from: aurora
+        to: out
+        signal: audio
+      - from: fx
+        to: out
+        signal: audio
+      - from: aikido
+        to: out
+        signal: audio

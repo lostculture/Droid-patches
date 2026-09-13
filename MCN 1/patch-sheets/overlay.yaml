@@ -1,0 +1,118 @@
+title: "MCN Droid Performance — Control Overlay"
+subtitle: "droid-mcn-performance.ini · 3-voice groove machine (Squid / Domino / Dimension MK3)"
+series: "MCN Droid Performance Rack"
+
+# Controllers in chain order (left to right in the rack) — this order is what
+# sets the addressing: controller 1 = first p2b8, controller 5 = p8s8.
+controllers:
+  - type: p2b8
+    index: 1
+    name: "Transport & Mutes"
+    pots:
+      - "Tempo"
+      - "Swing"
+    buttons:
+      - "Run / Stop"
+      - "Reset"
+      - "Clock divide"
+      - "Scene save (hold)"
+      - "Mute drums"
+      - "Mute bass"
+      - "Mute lead"
+      - "Mute mangle"
+
+  - type: p2b8
+    index: 2
+    name: "Morph & Reroll"
+    pots:
+      - "Macro depth"
+      - "Chaos"
+    buttons:
+      - "Reroll drums"
+      - "Reroll bass"
+      - "Reroll lead"
+      - "Reroll mangle"
+      - "Fill drums"
+      - "Fill mangle"
+      - "Lead octave"
+      - "Bass octave"
+
+  - type: p10
+    index: 3
+    name: "Live Parameters"
+    pots:
+      - "Drum density"
+      - "Map X"
+      - "Map Y"
+      - "Gate length"
+      - "Bass density"
+      - "Bass accent"
+      - "Lead density"
+      - "Lead register"
+      - "Mangle amount"
+      - "Timbre macro"
+
+  - type: b32
+    index: 4
+    name: "Scenes · Fills · Triggers"
+    buttons:
+      # Row 1-2 — scenes
+      - "Scene 1"
+      - "Scene 2"
+      - "Scene 3"
+      - "Scene 4"
+      - "Scene 5"
+      - "Scene 6"
+      - "Scene 7"
+      - "Scene 8"
+      # Row 3 — kit fills
+      - "Fill kick"
+      - "Fill snare"
+      - "Fill hat"
+      - "Fill perc"
+      # Row 4 — mangle rolls
+      - "Roll G5"
+      - "Roll G6"
+      - "Roll G7"
+      - "Roll G8"
+      # Row 5-6 — manual triggers
+      - "Trig kick"
+      - "Trig snare"
+      - "Trig hat"
+      - "Trig perc"
+      - "Trig G5"
+      - "Trig G6"
+      - "Trig G7"
+      - "Trig G8"
+      # Row 7 — drum pattern banks
+      - "Drum A"
+      - "Drum B"
+      - "Drum C"
+      - "Drum D"
+      # Row 8 — voice patterns + save
+      - "Bass pat"
+      - "Lead pat"
+      - "Mangle pat"
+      - "SAVE"
+
+  - type: p8s8
+    index: 5
+    name: "Per-channel Squid"
+    sliders:
+      - "Kick dens"
+      - "Snare dens"
+      - "Hat dens"
+      - "Perc dens"
+      - "G5 dens"
+      - "G6 dens"
+      - "G7 dens"
+      - "G8 dens"
+    switches:
+      - "Mute kick"
+      - "Mute snare"
+      - "Mute hat"
+      - "Mute perc"
+      - "Mute G5"
+      - "Mute G6"
+      - "Mute G7"
+      - "Mute G8"

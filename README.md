@@ -13,6 +13,12 @@ A collection of patches for the [DROID](https://shop.dermannmitdermaschine.de) m
 | [tintinnalogia-8bell-plainbob.ini](tintinnalogia-8bell-plainbob.ini) | 8-bell change ringing sequencer implementing Plain Hunt, Grandsire, and Plain Bob Major methods. Permutes pitched bells according to traditional English ringing rules. | p2b8 p2b8 p10 b32 |
 | [droid-tb303-acid.ini](droid-tb303-acid.ini) | TB-303 acid bass line generator with generative and fixed pattern modes, b32 step editing, probabilistic slide, accent envelopes, and 4 embedded classic acid patterns. | p2b8 p2b8 b32 |
 
+### Performance Patches
+
+| Patch | Description | Controllers |
+|-------|-------------|-------------|
+| [MCN 1](MCN%201/) | Three-voice performance groove machine for the MCN rack: 4 algorithmic drum channels + 4 euclidean mangle gates to the Squid (G1-G8), acid bass to the Domino (G10), MIDI lead to the Dimension MK3, with 8 native-preset scenes. | p2b8 p2b8 p10 b32 p8s8 |
+
 ### Rhythm Generators
 
 | Patch | Description | Controllers |

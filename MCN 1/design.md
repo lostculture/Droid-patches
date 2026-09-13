@@ -1,7 +1,7 @@
 # MCN Droid Performance Rack — Patch Design
 
 **Date:** 2026-09-12
-**Target file:** `droid-mcn-performance.ini`
+**Patch file:** `MCN 1/droid.ini`
 **Rack:** MCN Droid performance rack (ModularGrid #3087024)
 
 A three-voice performance groove machine driven entirely from one DROID master:
@@ -51,7 +51,7 @@ So the physical wiring maps as:
 
 ## 2. Routing
 
-![Gates, CV and MIDI routing](../../images/mcn-droid-routing.png)
+![Gates, CV and MIDI routing](images/routing.png)
 
 | Jack | Destination |
 |---|---|
@@ -63,26 +63,34 @@ So the physical wiring maps as:
 | `O1` | Domino pitch (quantized, with slide) |
 | `O2` | Domino accent |
 | `O3` | Domino filter / mod |
-| `O4`–`O5` | Multigrain position / size (from the joystick macro) |
+| `O4`–`O5` | Spare CV — free for whatever the set needs |
 | `O6` | Global filter macro (C4RBN / Dimension) |
 | `O7` | Space macro (Aurora / FX AID) |
 | `O8` | Accent bus |
 | MIDI TRS ch.1 | Dimension MK3: pitch + gate + velocity, CC1/CC2 |
 | `I1` / `I2` | External clock / reset (internal LFO normalled when unpatched) |
-| `I3` / `I4` | Joystick X / Y — stacked, also feeding Multigrain directly |
+| `I3` / `I4` | Joystick X / Y in — stacked; the joystick also feeds Multigrain directly |
 
 ### Audio path
 
-![Audio path](../../images/mcn-droid-audio.png)
+![Audio path](images/audio-path.png)
 
 The audio side is patched by hand and is shown for reference only — the DROID
 touches it solely through the `O6` / `O7` macros.
+
+### Joystick
+
+The joystick goes to Multigrain **directly** on stacked cables; the DROID does
+not pass it through. `I3` / `I4` are read only as macro *inputs*, offsetting the
+drum map and timbre internally (scaled by `P2.1` macro depth). That leaves `O4`
+and `O5` free — candidates are a second Domino mod CV, a Dimension CV, or a
+sequenced offset for whatever the set needs.
 
 ---
 
 ## 3. Control surface
 
-![DROID control overlay](../../images/mcn-droid-overlay.png)
+![DROID control overlay](images/overlay.png)
 
 Printable version: `modular-patches/patch-sheets/examples/mcn-droid-performance-overlay.yaml`
 (render with `python droid_overlay.py examples/mcn-droid-performance-overlay.yaml`).
@@ -142,15 +150,23 @@ Row-major, 4 columns × 8 rows:
 ## 4. Voice engines
 
 ### Drums — Squid, `G1`–`G4`
-Topographic (Grids-style) engine reused from `droid-mi-grids.ini`. `P3.1` sets
-density; `P3.2`/`P3.3` morph the map, and the joystick adds a live offset to
-both, scaled by `P2.1`. Per-channel density sliders on the P8S8 bias each
-channel around the global value.
+Four `[algoquencer]` circuits, one per channel. This replaces the Grids-style
+topographic engine the design originally proposed: `[algoquencer]` already has
+fills, rolls, morphs, branches and — decisively — per-circuit presets, which is
+what the scene system is built on. A Grids port would have needed its pattern
+tables plus a parallel scene mechanism.
+
+The map pots keep their meaning: `P3.2` (Map X) biases random beats towards
+offbeats, `P3.3` (Map Y) towards the second half of the bar, and the joystick
+adds a live offset to both, scaled by `P2.1`. `P3.1` sets global density and each
+P8S8 slider biases its channel around it (centre = neutral).
 
 ### Mangle — Squid, `G5`–`G8`
-Euclidean (`[euklid]`) patterns at clock multiples, gated by `P3.9` (mangle
-amount) and burst-multiplied by the roll buttons via `[burst]`. These are the
-slice / stutter / re-trigger gates for loops and textures.
+Four `[euklid]` circuits at different rotations and lengths (16/16/12/16) so
+they interlock rather than stack. `P3.9` sets how many beats land per cycle,
+`P5.5`–`P5.8` bias each channel around it, and `B2.4` rerolls the rotation via a
+`[random]`. Channel 7 passes through `[bernoulli]` so chaos thins it unevenly.
+Roll buttons fire `[burst]` ratchets synced to the clock with `taptempo`.
 
 ### Bass — Domino, `G10` + `O1`–`O3`
 Acid-style line: `[algoquencer]` with `dejavu = 1` for a remembered pattern,
@@ -174,25 +190,32 @@ circuit reference:
 
 ## 5. Scene system
 
-Scenes are a **capture-and-recall** system, not a full snapshot: a knob-based
-DROID cannot restore pot positions, so scenes store values and the pots stay
-live as offsets. Nothing jumps on recall.
+Built on DROID's **native per-circuit presets**, not the hand-rolled
+`[dac]`/`[sample]` bank the design first proposed. Most stateful circuits expose
+`preset`, `loadpreset`, `savepreset` and `clear` jacks, and feeding the `preset`
+input directly (no trigger) switches preset *and* stores edits into the current
+one. That is far cheaper and it persists to SD automatically.
 
-Each of the 8 scenes stores:
+A `[buttongroup]` over `B4.1`–`B4.8` outputs `_SCENE` (values 0–7), which is
+wired to `preset` on every sequencer, every state button and every macro pot. So
+a scene recalls:
 
-- the **8 Squid mute states**, packed into one CV by `[dac]` (bit1–bit8 → one
-  value), stored in a single `[sample]` per scene, and unpacked on recall by
-  `[adc]`. This costs about 17 circuits instead of the 64 that eight separate
-  per-mute sample banks would need.
-- **4 macros**: drum density, chaos, bass density, timbre.
+- all six sequencer patterns and their pattern-bank selections,
+- voice mutes, root note, clock divide, octave and rotation buttons,
+- the macro pot values — density, map X/Y, chaos, bass/lead density, mangle
+  amount, timbre. Pots use pickup, so a scene change does not jump a value until
+  you move the knob past it.
 
-Recall is a `[buttongroup]` over `B4.1`–`B4.8` feeding `[switch]` circuits;
-capture is `B4.32` (hold) + scene button, triggering the `[sample]` circuits for
-that scene.
+`B4.32` long-pressed fires `clear` on those circuits, resetting the current
+scene to defaults.
+
+Deliberately **not** scene-stored: the `S5.1`–`S5.8` mute switches (a physical
+switch position must always be the truth), and tempo, swing, gate length,
+accent, register and macro depth (live feel controls).
 
 ---
 
-## 6. Build order
+## 6. Build order (completed)
 
 1. Controller declarations, I/O header comment block, transport section
    (internal LFO normalled to `I1`, run/stop, reset, clock divide, `G9` clock out).
@@ -200,7 +223,7 @@ that scene.
 3. Mangle engine → `G5`–`G8`, rolls and fills.
 4. Bass engine → `G10`, `O1`–`O3`.
 5. Lead engine → `[midiout]`.
-6. Macro bus: joystick `I3`/`I4` → `O4`–`O8` and engine offsets.
+6. Macro bus: joystick `I3`/`I4` → engine offsets and `O6`–`O8`.
 7. Scene capture/recall.
 8. Docs: `patch-guide.md` section and a README table row.
 
@@ -210,12 +233,25 @@ that scene.
 
 Recorded as assumptions — say the word and they change before the build:
 
-1. **Drum engine** — Grids-style topographic for `G1`–`G4` (musical, maps
-   naturally onto the joystick) with Euclidean for `G5`–`G8`. The alternative is
-   Euclidean throughout: more predictable and easier to edit live, less groove.
-2. **Scene scope** — 8 mutes + 4 macros. Adding the pattern/bank selections
-   would make scenes behave like real song sections, at the cost of more
-   circuits and RAM.
+Both of the original open decisions were resolved during the build, in favour of
+what the circuits actually offer:
+
+1. **Drum engine** — `[algoquencer]` per channel rather than a Grids port, for
+   its native fills/rolls/morphs and, critically, its presets (see §4).
+2. **Scene scope** — wider than planned. Native presets made it cheap to store
+   every pattern, toggle and macro pot rather than 8 mutes + 4 macros (see §5).
+
+Still open, for the hardware:
+
+3. **Preset behaviour on `[pot]`** — the intent is per-scene pot values with
+   pickup. Confirm on the hardware that recalling a scene restores the stored
+   value and the knob picks up rather than snapping.
+4. **RAM** — six `[algoquencer]` circuits is the heaviest part of the patch.
+   Check the memory readout in DROID Forge; if it is tight, the first cut is
+   dropping the lead algoquencer to a `[euklid]` + `[random]` pitch pair.
+5. **Joystick polarity** — `I3`/`I4` are treated as bipolar (±5 V) so the
+   macros sit centred. If the Black Joystick 2 outputs 0–10 V, change
+   `_MACRO_X` / `_MACRO_Y` to `(I3 - 0.5) * _MACRO_DEPTH`.
 
 ---
 
