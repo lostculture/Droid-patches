@@ -47,11 +47,34 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 3. **P2.2** chaos: turns deja-vu down and morphing up across every sequencer.
 4. Hold **B4.9**–**B4.12** for kit fills, **B4.13**–**B4.16** for mangle rolls.
    **B4.17**–**B4.24** finger-trigger the eight Squid channels.
-5. **S5.1**–**S5.8** mute individual Squid channels; **B1.5**–**B1.8** mute
-   whole voices.
+5. **B1.5**–**B1.8** mute whole voices. The **S5.1**–**S5.8** per-channel mutes
+   ship **disabled** — see below.
 6. **B4.1**–**B4.8** switch scenes. Everything you change is stored into the
    current scene automatically — no save gesture. Long-press **B4.32** to reset
    the current scene.
+
+## The P8S8 switches
+
+DROID panel switches are 3-position and read 0.0 / 0.5 / 1.0, so a switch sitting
+up reads 1 and would silently multiply its channel's gate to zero. The mutes
+therefore ship disabled. Two constants near the top of `droid.ini` control them:
+
+```ini
+[copy]
+    input = 0          # _SWITCH_MUTES: 0 = ignore switches, 1 = they mute
+    output = _SWITCH_MUTES
+
+[copy]
+    input = 1          # _SWITCH_UP_MUTES: 1 = up mutes, 0 = down mutes
+    output = _SWITCH_UP_MUTES
+```
+
+Once the patch is playing, set `_SWITCH_MUTES` to 1 and check that flipping S5.1
+kills the kick. If it works the other way round, flip `_SWITCH_UP_MUTES` to 0.
+The centre position never mutes either way.
+
+The P8S8 sliders are always live and need no configuration — with the patch
+running, push P5.1 up and the kick gets busier.
 
 ## If the gates do not fire
 

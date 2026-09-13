@@ -213,6 +213,16 @@ Deliberately **not** scene-stored: the `S5.1`–`S5.8` mute switches (a physical
 switch position must always be the truth), and tempo, swing, gate length,
 accent, register and macro depth (live feel controls).
 
+### Switch handling
+
+DROID panel switches are 3-position, reading 0.0 / 0.5 / 1.0 — not a plain
+on/off. Multiplying a gate by `(1 - S5.n)` therefore zeroes the gate when the
+switch is up and *halves* it at centre. Each switch now runs through a
+`[compare]` against 0.5, so only a hard up or down mutes and centre never does,
+and two constants (`_SWITCH_MUTES`, `_SWITCH_UP_MUTES`) make the feature and its
+polarity a one-line change. The mutes default to off so the patch plays
+regardless of where the switches happen to sit.
+
 ---
 
 ## 6. Build order (completed)
