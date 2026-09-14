@@ -306,6 +306,14 @@ reduced to zero, with nothing on the panel to show which factor did it:
 3. **A density pot at zero**, made worse by preset pickup holding a stored zero
    while the knob sat elsewhere. Fixed with `startvalue` on every preset-backed
    pot.
+4. **Invalid parameter expressions — the real cause of the silent drums.** A
+   DROID input computes A x B + C: one multiplication, one offset. Every drum
+   and mangle gate was written with three products and a bracket, so the
+   parameter never evaluated and the gate never fired. This was present from the
+   first version, which is why those channels never once worked while the bass,
+   lead and Multigrain — whose expressions happened to fit the form — worked
+   throughout. The gates are now built from `[logic]` circuits, and
+   `tools/check-expressions.py` catches the whole class.
 
 The lasting fixes are structural, not one-off: the status row on B32 LEDs 9–12
 shows each factor of the drum path live, the `_USE_P8S8` and `_SWITCH_MUTES`

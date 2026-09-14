@@ -125,6 +125,31 @@ dark and tells you why:
 | `L4.11` | Channel 1 not muted | `S5.1` is muting it |
 | `L4.12` | Clock | Transport stopped — press `B1.1` |
 
+## A DROID parameter is only A x B + C
+
+The manual's "Multiply and Add, Attenuation and Offset" section is a hard limit,
+not a style note: **one multiplication and one offset per input**, where the
+factor and offset may themselves be cables. Anything richer — parentheses, a
+second product, a third term — is not a valid expression, and the parameter
+simply never evaluates. Nothing looks wrong in the file; a gate just never fires
+and an LED never lights.
+
+This silenced the drums and mangle channels from the very first version of this
+patch, because every one of their gates was written as
+
+```ini
+input = _D1_TRIG * _DRUMS_ON * (-1 * _MUTE1 * _SWITCH_MUTES + 1) + B4.17
+```
+
+They are now built from `[logic]` instead — `and` to combine the trigger with
+the voice and channel enables, `or` to fold in the manual trigger and rolls.
+
+`tools/check-expressions.py` in the repo root catches this:
+
+```bash
+python tools/check-expressions.py "MCN 1/droid.ini"
+```
+
 ## Diagnostics
 
 Five patches in `diagnostics/`, each self-contained. Copy one to the SD card as
