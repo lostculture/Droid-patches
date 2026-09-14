@@ -8,6 +8,7 @@ machine with eight scenes.
 | `droid.ini` | The patch. Copy to the root of the DROID SD card. |
 | `gate-test.ini` | Diagnostic — blinks every G8 and X7 gate with no controllers or clock needed |
 | `drum-test.ini` | Diagnostic — runs the drum engine alone, with a non-sequenced control gate on G11 |
+| `controller-test.ini` | Diagnostic — proves which controllers the master is actually addressing |
 | `design.md` | Full design: routing, control map, voice engines, scene system |
 | `overlay-print.pdf` | Printable controller overlay (A4 landscape) |
 | `routing-print.pdf` | Printable routing + audio path sheets |
@@ -57,6 +58,24 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 6. **B4.1**–**B4.8** switch scenes. Everything you change is stored into the
    current scene automatically — no save gesture. Long-press **B4.32** to reset
    the current scene.
+
+## The P8S8
+
+The patch ships **not depending on the P8S8 at all**. Two constants near the top
+of `droid.ini` bring it in once you have confirmed the master addresses it:
+
+```ini
+[copy]
+    input = 0          # _USE_P8S8: 0 = ignore faders, 1 = faders scale channels
+    output = _USE_P8S8
+```
+
+Run `controller-test.ini` to check: push each fader and the matching Squid gate
+G1–G8 should go high, and the fader's own LED should follow it. If every other
+controller responds but the P8S8 does not, the master is not addressing it as
+controller 5 — check the **ribbon chain order** (rack position is irrelevant,
+the daisy-chain order is what counts) and the firmware version, since the P8S8
+is a late-2024 module.
 
 ## The P8S8 switches
 
