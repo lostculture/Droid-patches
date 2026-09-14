@@ -3,6 +3,11 @@
 Performance patch for the MCN Droid performance rack — a three-voice groove
 machine with eight scenes.
 
+**Requires DROID firmware blue-7.** The P8S8 is a late-2024 controller; older
+firmware lights it up on boot but never addresses it, which silently kills every
+channel whose density reads a `P5` jack — the drums and three of the four mangle
+slots — while the bass, lead and Multigrain carry on as if nothing were wrong.
+
 | File | What it is |
 |---|---|
 | `droid.ini` | The patch. Copy to the root of the DROID SD card. |
@@ -61,44 +66,35 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 
 ## The P8S8
 
-The patch ships **not depending on the P8S8 at all**. Two constants near the top
-of `droid.ini` bring it in once you have confirmed the master addresses it:
+The faders scale their own channel's density, 40% fully down to 100% fully up.
+If the P8S8 ever stops responding, one constant near the top of `droid.ini`
+takes it out of the signal path entirely and the patch keeps playing:
 
 ```ini
 [copy]
-    input = 0          # _USE_P8S8: 0 = ignore faders, 1 = faders scale channels
+    input = 1          # _USE_P8S8: 1 = faders scale channels, 0 = ignore them
     output = _USE_P8S8
 ```
 
-Run `controller-test.ini` to check: push each fader and the matching Squid gate
-G1–G8 should go high, and the fader's own LED should follow it. If every other
-controller responds but the P8S8 does not, the master is not addressing it as
-controller 5 — check the **ribbon chain order** (rack position is irrelevant,
-the daisy-chain order is what counts) and the firmware version, since the P8S8
-is a late-2024 module.
+`controller-test.ini` checks the controller itself: push each fader and the
+matching Squid gate G1–G8 should go high, with the fader's own LED following it.
+If every other controller responds but the P8S8 does not, suspect the firmware
+first, then the ribbon chain order (rack position is irrelevant — only the
+daisy-chain order counts).
 
 ## The P8S8 switches
 
-DROID panel switches are 3-position and read 0.0 / 0.5 / 1.0, so a switch sitting
-up reads 1 and would silently multiply its channel's gate to zero. The mutes
-therefore ship disabled. Two constants near the top of `droid.ini` control them:
+The switches are 3-position, reading 0.0 / 0.5 / 1.0. **Pulling a switch fully
+down mutes its channel**; centre and up both play, so a channel is never
+silenced by a switch you have not deliberately moved. If that feels backwards:
 
 ```ini
 [copy]
-    input = 0          # _SWITCH_MUTES: 0 = ignore switches, 1 = they mute
-    output = _SWITCH_MUTES
-
-[copy]
-    input = 1          # _SWITCH_UP_MUTES: 1 = up mutes, 0 = down mutes
+    input = 0          # _SWITCH_UP_MUTES: 0 = down mutes, 1 = up mutes
     output = _SWITCH_UP_MUTES
 ```
 
-Once the patch is playing, set `_SWITCH_MUTES` to 1 and check that flipping S5.1
-kills the kick. If it works the other way round, flip `_SWITCH_UP_MUTES` to 0.
-The centre position never mutes either way.
-
-The P8S8 sliders are always live and need no configuration — with the patch
-running, push P5.1 up and the kick gets busier.
+Set `_SWITCH_MUTES` to 0 to ignore the switches altogether.
 
 ## If the drums are silent
 

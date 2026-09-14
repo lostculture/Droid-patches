@@ -3,6 +3,7 @@
 **Date:** 2026-09-12
 **Patch file:** `MCN 1/droid.ini`
 **Rack:** MCN Droid performance rack (ModularGrid #3087024)
+**Firmware:** DROID blue-7 or later (required — see §1)
 
 A three-voice performance groove machine driven entirely from one DROID master:
 drums and sample mangling on the Squid Salmple, bass on the Domino, and a
@@ -25,6 +26,21 @@ melodic lead sent over MIDI to the Ziqal Dimension MK3.
 Declaration order in the `.ini` must match the physical left-to-right chain, as
 laid out in the rack (P2B8 at col 1, P2B8 at col 6, P10 at col 11, B32 at col
 16, P8S8 at col 26).
+
+### Firmware
+
+The patch requires **blue-7**. The P8S8 shipped in late 2024, and firmware
+without support for it lights the controller on boot but never addresses it.
+Because a missing controller takes down only the circuits that read its jacks,
+the failure is deeply misleading: the drums and three mangle channels go silent
+while the bass, lead and Multigrain — none of which read a `P5` jack — play
+normally, which reads as a broken drum engine rather than a missing controller.
+`controller-test.ini` in this folder isolates it in seconds.
+
+Two blue-7 changes were checked against this patch and neither requires action:
+`[algoquencer]` now always starts unmuted when no mute button is wired (helpful
+here, since none is), and `[midiout]` rounds `cc1`–`cc8` to the nearest MIDI
+value instead of truncating.
 
 ### Expanders
 
@@ -262,6 +278,7 @@ Still open, for the hardware:
    pickup. Confirm on the hardware that recalling a scene restores the stored
    value and the knob picks up rather than snapping.
 4. **RAM** — six `[algoquencer]` circuits is the heaviest part of the patch.
+   blue-7 reports more free RAM than blue-6, so this may be a non-issue.
    Check the memory readout in DROID Forge; if it is tight, the first cut is
    dropping the lead algoquencer to a `[euklid]` + `[random]` pitch pair.
 5. **Joystick polarity** — `I3`/`I4` are treated as bipolar (±5 V) so the
