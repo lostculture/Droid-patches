@@ -97,7 +97,8 @@ daisy-chain order counts).
 
 ## The P8S8 switches
 
-The switches are 3-position, reading 0.0 / 0.5 / 1.0. **Pulling a switch fully
+The switches are 3-position, reading 0.0 / 0.5 / 1.0, and the centre band is
+0.25–0.75 so a centred switch is never read as "down". **Pulling a switch fully
 down mutes its channel**; centre and up both play, so a channel is never
 silenced by a switch you have not deliberately moved. If that feels backwards:
 
@@ -108,6 +109,19 @@ silenced by a switch you have not deliberately moved. If that feels backwards:
 ```
 
 Set `_SWITCH_MUTES` to 0 to ignore the switches altogether.
+
+## Reading the status row
+
+The four fill buttons on the B32 have no LEDs of their own, so LEDs 9–12 show
+the state of the drum path instead. If the drums are silent, one of these is
+dark and tells you why:
+
+| LED | Means | If dark |
+|---|---|---|
+| `L4.9` | Drums voice on | Press `B1.5` |
+| `L4.10` | Drum density (brightness = value) | Turn `P3.1` up |
+| `L4.11` | Channel 1 not muted | `S5.1` is muting it |
+| `L4.12` | Clock | Transport stopped — press `B1.1` |
 
 ## If the drums are silent
 
