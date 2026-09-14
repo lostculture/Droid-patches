@@ -11,11 +11,7 @@ slots — while the bass, lead and Multigrain carry on as if nothing were wrong.
 | File | What it is |
 |---|---|
 | `droid.ini` | The patch. Copy to the root of the DROID SD card. |
-| `gate-test.ini` | Diagnostic — blinks every G8 and X7 gate with no controllers or clock needed |
-| `drum-test.ini` | Diagnostic — runs the drum engine alone, with a non-sequenced control gate on G11 |
-| `controller-test.ini` | Diagnostic — proves which controllers the master is actually addressing |
-| `stage1.ini` | Diagnostic — the main patch's drum path alone, 20 circuits instead of 111 |
-| `stage2.ini` | Diagnostic — four algoquencers, one variable changed each, to bisect the cause |
+|||||| `diagnostics/` | Five test patches that bisect a silent patch — see below |
 | `design.md` | Full design: routing, control map, voice engines, scene system |
 | `overlay-print.pdf` | Printable controller overlay (A4 landscape) |
 | `routing-print.pdf` | Printable routing + audio path sheets |
@@ -124,6 +120,23 @@ dark and tells you why:
 | `L4.10` | Drum density (brightness = value) | Turn `P3.1` up |
 | `L4.11` | Channel 1 not muted | `S5.1` is muting it |
 | `L4.12` | Clock | Transport stopped — press `B1.1` |
+
+## Diagnostics
+
+Five patches in `diagnostics/`, each self-contained. Copy one to the SD card as
+`droid.ini` to run it. In order of what they isolate:
+
+| File | Proves |
+|---|---|
+| `gate-test.ini` | The G8 and X7 wiring — blinks G1–G12 with no controllers or clock |
+| `controller-test.ini` | Which controllers the master is addressing — every control responds instantly |
+| `drum-test.ini` | The drum engine alone, with a non-sequenced control gate on G11 |
+| `stage1.ini` | The full drum path at 20 circuits instead of 111 |
+| `stage2.ini` | Four algoquencers, one variable changed each, to bisect further |
+
+Between them they have caught, in this rack: an outdated firmware that lit the
+P8S8 on boot without ever addressing it, a centred 3-way switch being read as
+"down", and a density pot sitting at zero.
 
 ## If the drums are silent
 

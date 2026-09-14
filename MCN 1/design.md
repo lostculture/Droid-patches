@@ -274,9 +274,12 @@ what the circuits actually offer:
 
 Still open, for the hardware:
 
-3. **Preset behaviour on `[pot]`** — the intent is per-scene pot values with
-   pickup. Confirm on the hardware that recalling a scene restores the stored
-   value and the knob picks up rather than snapping.
+3. ~~**Preset behaviour on `[pot]`**~~ — resolved on the hardware. A
+   preset-backed pot does recall a stored value and pick up the physical knob
+   only once you sweep past it. The consequence is sharp: a stored zero on a
+   density pot is silence with the knob sitting at maximum, and nothing on the
+   panel explains it. Every preset-backed pot therefore now carries a musical
+   `startvalue`.
 4. **RAM** — six `[algoquencer]` circuits is the heaviest part of the patch.
    blue-7 reports more free RAM than blue-6, so this may be a non-issue.
    Check the memory readout in DROID Forge; if it is tight, the first cut is
@@ -287,7 +290,29 @@ Still open, for the hardware:
 
 ---
 
-## 8. Sources
+## 8. What silenced this patch, and why it was hard to see
+
+Three separate faults, each with the same signature — an output silently
+reduced to zero, with nothing on the panel to show which factor did it:
+
+1. **Firmware.** The P8S8 is a late-2024 controller; firmware without support
+   lit it on boot but never addressed it. A missing controller only takes down
+   the circuits that read its jacks, so the drums and three mangle channels went
+   silent while the bass, lead and Multigrain played on — which reads as a broken
+   drum engine rather than a missing controller. Fixed by blue-7.
+2. **A centred switch read as "down".** `[compare]` tests equality exactly
+   unless given a `precision`, so a 3-way switch at centre reading 0.4999 fell
+   through to the mute branch. Fixed with `precision = 0.25`.
+3. **A density pot at zero**, made worse by preset pickup holding a stored zero
+   while the knob sat elsewhere. Fixed with `startvalue` on every preset-backed
+   pot.
+
+The lasting fixes are structural, not one-off: the status row on B32 LEDs 9–12
+shows each factor of the drum path live, the `_USE_P8S8` and `_SWITCH_MUTES`
+constants take whole subsystems out of the signal path in one line, and the five
+patches in `diagnostics/` bisect the rack from wiring up to sequencer.
+
+## 9. Sources
 
 - Circuit parameter reference (auto-generated from the DROID `blue-6` manual):
   [Eising/droid-metapatch](https://github.com/Eising/droid-metapatch)
