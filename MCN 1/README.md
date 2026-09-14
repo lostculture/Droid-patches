@@ -48,6 +48,19 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 
 `O4` and `O5` are free.
 
+## Output levels
+
+| Output | Level |
+|---|---|
+| `G1`–`G8` (G8 expander → Squid) | 0 V / 5 V, fixed in hardware, not adjustable |
+| `G9`–`G12` (X7) | gate/trigger at modular level |
+| `O1`–`O8` (CV) | 0–10 V, where a patch value of 1.0 = 10 V |
+
+The gate jacks are binary: any non-zero value from the patch comes out as a full
+5 V gate, so gate levels need nothing done to them. The CV outputs are the ones
+to watch — if a destination wants 0–5 V rather than 0–10 V, halve the value on
+the way out, e.g. `input = _BASS_ACC * _BASS_ACCENT * 0.5`.
+
 ## Play it
 
 1. Press **B1.1** to run. **P1.1** is tempo, **P1.2** swing.
