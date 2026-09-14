@@ -1,5 +1,5 @@
 title: "MCN Droid Performance — Control Overlay"
-subtitle: "droid-mcn-performance.ini · 3-voice groove machine (Squid / Domino / Dimension MK3)"
+subtitle: "MCN 1 · 3-voice groove machine (Squid / Domino / Dimension MK3)"
 series: "MCN Droid Performance Rack"
 
 # Controllers in chain order (left to right in the rack) — this order is what
@@ -15,7 +15,7 @@ controllers:
       - "Run / Stop"
       - "Reset"
       - "Clock divide"
-      - "Scene save (hold)"
+      - "Root note"
       - "Mute drums"
       - "Mute bass"
       - "Mute lead"
@@ -71,16 +71,16 @@ controllers:
       - "Fill hat"
       - "Fill perc"
       # Row 4 — mangle rolls
-      - "Roll G5"
       - "Roll G6"
       - "Roll G7"
       - "Roll G8"
+      - "Roll Mgrain"
       # Row 5-6 — manual triggers
       - "Trig kick"
+      - "(blank ch2)"
       - "Trig snare"
       - "Trig hat"
       - "Trig perc"
-      - "Trig G5"
       - "Trig G6"
       - "Trig G7"
       - "Trig G8"
@@ -93,26 +93,26 @@ controllers:
       - "Bass pat"
       - "Lead pat"
       - "Mangle pat"
-      - "SAVE"
+      - "Clear scene"
 
   - type: p8s8
     index: 5
     name: "Per-channel Squid"
     sliders:
       - "Kick dens"
+      - "(free)"
       - "Snare dens"
       - "Hat dens"
       - "Perc dens"
-      - "G5 dens"
       - "G6 dens"
       - "G7 dens"
       - "G8 dens"
     switches:
       - "Mute kick"
+      - "(free)"
       - "Mute snare"
       - "Mute hat"
       - "Mute perc"
-      - "Mute G5"
       - "Mute G6"
       - "Mute G7"
       - "Mute G8"

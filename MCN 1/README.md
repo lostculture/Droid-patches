@@ -24,12 +24,14 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 
 | Jack | To |
 |---|---|
-| `G1`–`G4` | Squid: kick / snare / hat / perc |
-| `G5`–`G8` | Squid: mangle slots |
+| `G1` | Squid: kick |
+| `G2` | Squid: left blank on purpose |
+| `G3`–`G5` | Squid: snare / hat / perc |
+| `G6`–`G8` | Squid: mangle slots |
 | `G9` | Clock out (X7 gate 1) |
 | `G10` | Domino gate (X7 gate 2) |
 | `G11` | Start of bar (X7 gate 3, spare) |
-| `G12` | Multigrain trigger (X7 gate 4) |
+| `G12` | Multigrain — mangle engine 4 (X7 gate 4) |
 | `O1`–`O3` | Domino pitch / accent / filter |
 | `O6`–`O7` | Filter macro, space macro |
 | `O8` | Accent bus |
@@ -45,8 +47,9 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 2. **P3.1** drum density, **P3.2/P3.3** map X/Y — these are the main "move the
    groove" knobs. The joystick offsets both, scaled by **P2.1**.
 3. **P2.2** chaos: turns deja-vu down and morphing up across every sequencer.
-4. Hold **B4.9**–**B4.12** for kit fills, **B4.13**–**B4.16** for mangle rolls.
-   **B4.17**–**B4.24** finger-trigger the eight Squid channels.
+4. Hold **B4.9**–**B4.12** for kit fills, **B4.13**–**B4.16** for mangle rolls
+   (the fourth rolls the Multigrain). **B4.17**–**B4.24** finger-trigger the
+   Squid channels; **B4.18** is the blank channel 2.
 5. **B1.5**–**B1.8** mute whole voices. The **S5.1**–**S5.8** per-channel mutes
    ship **disabled** — see below.
 6. **B4.1**–**B4.8** switch scenes. Everything you change is stored into the

@@ -55,11 +55,13 @@ So the physical wiring maps as:
 
 | Jack | Destination |
 |---|---|
-| `G1`–`G4` | Squid: kick / snare / hat / perc |
-| `G5`–`G8` | Squid: mangle slots (ratchets, stutters, chance one-shots) |
+| `G1` | Squid: kick |
+| `G2` | Squid: left blank on purpose |
+| `G3`–`G5` | Squid: snare / hat / perc |
+| `G6`–`G8` | Squid: mangle slots (ratchets, stutters, chance one-shots) |
 | `G9` | Clock out to the rack (X7 gate 1) |
 | `G10` | Domino gate (X7 gate 2) |
-| `G12` | Multigrain grain/slice trigger (X7 gate 4) |
+| `G12` | Multigrain — mangle engine 4 (X7 gate 4) |
 | `O1` | Domino pitch (quantized, with slide) |
 | `O2` | Domino accent |
 | `O3` | Domino filter / mod |
@@ -133,23 +135,23 @@ Row-major, 4 columns × 8 rows:
 |---|---|
 | `B4.1`–`B4.8` | Scenes 1–8 |
 | `B4.9`–`B4.12` | Fills: kick / snare / hat / perc |
-| `B4.13`–`B4.16` | Rolls: G5 / G6 / G7 / G8 |
-| `B4.17`–`B4.24` | Manual triggers for G1–G8 |
+| `B4.13`–`B4.16` | Rolls: mangle 1–4 (G6 / G7 / G8 / Multigrain) |
+| `B4.17`–`B4.24` | Manual triggers for G1–G8 (`B4.18` = blank channel 2) |
 | `B4.25`–`B4.28` | Drum pattern banks A–D |
 | `B4.29`–`B4.31` | Bass / lead / mangle pattern select |
-| `B4.32` | SAVE (hold + scene = store) |
+| `B4.32` | Clear current scene (long press) |
 
 ### Controller 5 (p8s8) — Per-channel Squid
 | Control | Function |
 |---|---|
-| `P5.1`–`P5.8` | Per-channel density for G1–G8 |
-| `S5.1`–`S5.8` | Per-channel mute for G1–G8 |
+| `P5.1`–`P5.8` | Per-channel density by Squid channel — `P5.2` free (blank channel) |
+| `S5.1`–`S5.8` | Per-channel mute by Squid channel — off by default, see below |
 
 ---
 
 ## 4. Voice engines
 
-### Drums — Squid, `G1`–`G4`
+### Drums — Squid, `G1` and `G3`–`G5`
 Four `[algoquencer]` circuits, one per channel. This replaces the Grids-style
 topographic engine the design originally proposed: `[algoquencer]` already has
 fills, rolls, morphs, branches and — decisively — per-circuit presets, which is
@@ -161,12 +163,15 @@ offbeats, `P3.3` (Map Y) towards the second half of the bar, and the joystick
 adds a live offset to both, scaled by `P2.1`. `P3.1` sets global density and each
 P8S8 slider biases its channel around it (centre = neutral).
 
-### Mangle — Squid, `G5`–`G8`
+### Mangle — Squid `G6`–`G8`, plus Multigrain
 Four `[euklid]` circuits at different rotations and lengths (16/16/12/16) so
-they interlock rather than stack. `P3.9` sets how many beats land per cycle,
-`P5.5`–`P5.8` bias each channel around it, and `B2.4` rerolls the rotation via a
-`[random]`. Channel 7 passes through `[bernoulli]` so chaos thins it unevenly.
-Roll buttons fire `[burst]` ratchets synced to the clock with `taptempo`.
+they interlock rather than stack. Three drive Squid channels `G6`–`G8`; the
+fourth has no Squid channel left after the shift, so it drives the Multigrain on
+`G12` with its own rhythm rather than a mix of the others. `P3.9` sets how many
+beats land per cycle, `P5.6`–`P5.8` bias the three Squid channels around it, and
+`B2.4` rerolls the rotation via a `[random]`. The third passes through
+`[bernoulli]` so chaos thins it unevenly. Roll buttons fire `[burst]` ratchets
+synced to the clock with `taptempo`.
 
 ### Bass — Domino, `G10` + `O1`–`O3`
 Acid-style line: `[algoquencer]` with `dejavu = 1` for a remembered pattern,

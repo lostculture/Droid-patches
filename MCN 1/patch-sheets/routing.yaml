@@ -24,7 +24,7 @@ pages:
 
       - id: squid
         type: SQUID SALMPLE
-        label: "G1-G4 kit · G5-G8 mangle"
+        label: "G1 G3-G5 kit · G6-G8 mangle"
         pos: [2, 0]
 
       - id: domino
@@ -34,7 +34,7 @@ pages:
 
       - id: mgrain
         type: MULTIGRAIN
-        label: "G12 trig · joystick CV"
+        label: "G12 mangle 4 · joystick CV"
         pos: [2, 3]
 
       - id: dim
