@@ -95,18 +95,22 @@ daisy-chain order counts).
 
 ## The P8S8 switches
 
-The switches are 3-position, reading 0.0 / 0.5 / 1.0, and the centre band is
-0.25–0.75 so a centred switch is never read as "down". **Pulling a switch fully
-down mutes its channel**; centre and up both play, so a channel is never
-silenced by a switch you have not deliberately moved. If that feels backwards:
+The switches are 3-position, reading 0.0 / 0.5 / 1.0. They ship **disabled**, so
+no switch position can silence a channel:
 
 ```ini
 [copy]
-    input = 0          # _SWITCH_UP_MUTES: 0 = down mutes, 1 = up mutes
-    output = _SWITCH_UP_MUTES
+    input = 0          # _SWITCH_MUTES: 0 = ignore switches, 1 = down mutes
+    output = _SWITCH_MUTES
 ```
 
-Set `_SWITCH_MUTES` to 0 to ignore the switches altogether.
+Set it to 1 when you want per-channel mutes, and watch `L4.11` — that LED is the
+channel 1 mute term and must stay lit with the switch centred or up. If it goes
+dark with nothing muted, set the constant back to 0 and tell me.
+
+The comparison uses plain numbers rather than a cable for its branches. With a
+cable there, a centred switch was read as "down" and muted every channel, while
+the identical comparison written with literals read the same switch correctly.
 
 ## Reading the status row
 
