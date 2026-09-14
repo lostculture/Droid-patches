@@ -7,6 +7,7 @@ machine with eight scenes.
 |---|---|
 | `droid.ini` | The patch. Copy to the root of the DROID SD card. |
 | `gate-test.ini` | Diagnostic — blinks every G8 and X7 gate with no controllers or clock needed |
+| `drum-test.ini` | Diagnostic — runs the drum engine alone, with a non-sequenced control gate on G11 |
 | `design.md` | Full design: routing, control map, voice engines, scene system |
 | `overlay-print.pdf` | Printable controller overlay (A4 landscape) |
 | `routing-print.pdf` | Printable routing + audio path sheets |
@@ -50,8 +51,9 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 4. Hold **B4.9**–**B4.12** for kit fills, **B4.13**–**B4.16** for mangle rolls
    (the fourth rolls the Multigrain). **B4.17**–**B4.24** finger-trigger the
    Squid channels; **B4.18** is the blank channel 2.
-5. **B1.5**–**B1.8** mute whole voices. The **S5.1**–**S5.8** per-channel mutes
-   ship **disabled** — see below.
+5. **B1.5**–**B1.8** switch whole voices on and off — **LED lit = playing**, and
+   all four start on. The **S5.1**–**S5.8** per-channel mutes ship **disabled**
+   — see below.
 6. **B4.1**–**B4.8** switch scenes. Everything you change is stored into the
    current scene automatically — no save gesture. Long-press **B4.32** to reset
    the current scene.
@@ -78,6 +80,19 @@ The centre position never mutes either way.
 
 The P8S8 sliders are always live and need no configuration — with the patch
 running, push P5.1 up and the kick gets busier.
+
+## If the drums are silent
+
+Run `drum-test.ini`. It plays four drum channels with fixed densities, no pots,
+no buttons and no presets, plus a non-sequenced control gate on `G11`:
+
+- **All of G1 G3 G4 G5 and G11 blink** → the engine is fine, so it is a
+  parameter in `droid.ini`. Check `B1.5` is lit (dark = drums off), turn `P3.1`
+  up, and long-press `B4.32` to clear the scene — voice states are stored per
+  scene and survive a reboot.
+- **Only G11 blinks** → `[algoquencer]` is producing nothing. Tell me; the drum
+  engine would need replacing with `[euklid]`.
+- **Nothing blinks** → the patch is not running at all.
 
 ## If the gates do not fire
 

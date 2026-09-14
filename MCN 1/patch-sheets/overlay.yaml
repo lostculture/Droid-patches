@@ -16,10 +16,10 @@ controllers:
       - "Reset"
       - "Clock divide"
       - "Root note"
-      - "Mute drums"
-      - "Mute bass"
-      - "Mute lead"
-      - "Mute mangle"
+      - "Drums on"
+      - "Bass on"
+      - "Lead on"
+      - "Mangle on"
 
   - type: p2b8
     index: 2
