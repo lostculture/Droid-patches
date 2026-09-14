@@ -14,6 +14,7 @@ slots — while the bass, lead and Multigrain carry on as if nothing were wrong.
 | `gate-test.ini` | Diagnostic — blinks every G8 and X7 gate with no controllers or clock needed |
 | `drum-test.ini` | Diagnostic — runs the drum engine alone, with a non-sequenced control gate on G11 |
 | `controller-test.ini` | Diagnostic — proves which controllers the master is actually addressing |
+| `stage1.ini` | Diagnostic — the main patch's drum path alone, 20 circuits instead of 111 |
 | `design.md` | Full design: routing, control map, voice engines, scene system |
 | `overlay-print.pdf` | Printable controller overlay (A4 landscape) |
 | `routing-print.pdf` | Printable routing + audio path sheets |
