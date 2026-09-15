@@ -77,14 +77,16 @@ So the physical wiring maps as:
 | `G6`–`G8` | Squid: mangle slots (ratchets, stutters, chance one-shots) |
 | `G9` | Clock out to the rack (X7 gate 1) |
 | `G10` | Domino gate (X7 gate 2) |
+| `G11` | PIZZA trigger / gate (X7 gate 3) |
 | `G12` | Multigrain — mangle engine 4 (X7 gate 4) |
 | `O1` | Domino pitch (quantized, with slide) |
 | `O2` | Domino accent |
 | `O3` | Domino filter / mod |
-| `O4`–`O5` | Spare CV — free for whatever the set needs |
+| `O4` | General purpose LFO — rate, level, waveform on page 2 |
+| `O5` | PIZZA pitch (1V/oct) |
 | `O6` | Global filter macro (C4RBN / Dimension) |
 | `O7` | Space macro (Aurora / FX AID) |
-| `O8` | Accent bus |
+| `O8` | PIZZA ADSR envelope |
 | MIDI TRS ch.1 | Dimension MK3: pitch + gate + velocity, CC1/CC2 |
 | `I1` / `I2` | External clock / reset (internal LFO normalled when unpatched) |
 | `I3` / `I4` | Joystick X / Y in — stacked; the joystick also feeds Multigrain directly |
@@ -190,9 +192,34 @@ beats land per cycle, `P5.6`–`P5.8` bias the three Squid channels around it, a
 synced to the clock with `taptempo`.
 
 ### Bass — Domino, `G10` + `O1`–`O3`
-Acid-style line: `[algoquencer]` with `dejavu = 1` for a remembered pattern,
-`[minifonion]` quantizing to the global key/scale, `[slew]` for probabilistic
-slide, and an accent bus that drives both `O2` and the filter CV `O3`.
+Acid/303 line: `[algoquencer]` with `dejavu = 1` for a remembered pattern,
+`[minifonion]` quantizing to the global key/scale, `[slew]` giving accented notes
+a glide into pitch, and an accent that drives both `O2` and the filter envelope
+on `O3`. Offbeat-leaning placement and occasional two-step ratchets give it the
+303 push; `pitchresolution = 12` puts the raw line on a semitone grid before
+quantizing.
+
+**Pitch range** is the part that matters in this rack, because the line was
+climbing out of bass register. `pitchlow` and `pitchhigh` are now driven:
+
+    _BASS_SHIFT = _BASS_OCTAVE + _BASS_MASTER      bottom of the line
+    _BASS_TOP   = _BASS_SHIFT  + _BASS_SPREAD      ceiling
+
+so `P3.8` (master, bipolar ±1 oct) moves the whole line and `P3.7` (spread,
+0–1 oct) sets how far it may travel upward — from one repeated note to an octave.
+
+### PIZZA — Bastl oscillator, `O5` + `G11` + `O8`
+
+Added when the Javelin came out of the rack, so the envelope and VCA shaping it
+used to provide now come from the DROID. PIZZA has no sequencer of its own:
+a `[switch]` pair points its pitch and gate at either the lead line or the bass
+line, chosen by `S5.2` — free because Squid channel 2 is blank — with `P3.10`
+transposing it ±1 octave so it can sit under the lead or an octave above the
+bass. A `[contour]` on `O8` gives it a full ADSR, and the general `[lfo]` on `O4`
+is available for FM index, folding or filter.
+
+Reusing an existing line rather than adding a seventh `[algoquencer]` keeps the
+RAM cost to five small circuits.
 
 ### Lead — Dimension MK3 over MIDI
 `[midiout]` on channel 1, TRS. Confirmed parameter shapes from the blue-6

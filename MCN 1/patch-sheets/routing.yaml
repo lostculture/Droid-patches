@@ -1,10 +1,10 @@
 title: "MCN Droid Performance Rack"
-subtitle: "3-voice groove machine — gates, CV and MIDI from one DROID"
+subtitle: "4-voice groove machine — gates, CV and MIDI from one DROID"
 series: "MCN Droid Performance Rack"
 
 pages:
   - title: "Gates, CV & MIDI Routing"
-    subtitle: "DROID master + X7 + G8 driving three voices"
+    subtitle: "DROID master + X7 + G8 driving four voices"
     description: ""
     modules:
       - id: joy
@@ -41,6 +41,11 @@ pages:
         type: DIMENSION MK3
         label: "MIDI ch.1 + CC"
         pos: [2, 4]
+
+      - id: pizza
+        type: PIZZA
+        label: "O5 pitch · G11 · O8 env"
+        pos: [4, 0]
 
       - id: carbn
         type: C4RBN
@@ -87,6 +92,10 @@ pages:
         signal: mod
         label: "MIDI TRS"
       - from: droid
+        to: pizza
+        signal: cv
+        label: "O5 pitch · O8 env"
+      - from: droid
         to: carbn
         signal: cv
         label: "O6"
@@ -117,6 +126,11 @@ pages:
         type: DIMENSION MK3
         label: "Lead (MIDI)"
         pos: [0, 4]
+
+      - id: pizza
+        type: PIZZA
+        label: "DROID pitch + env"
+        pos: [0, 3]
 
       - id: carbn
         type: C4RBN
@@ -163,6 +177,9 @@ pages:
         signal: audio
         label: "kit"
       - from: domino
+        to: carbn
+        signal: audio
+      - from: pizza
         to: carbn
         signal: audio
       - from: carbn

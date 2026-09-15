@@ -1,7 +1,9 @@
 # MCN 1
 
-Performance patch for the MCN Droid performance rack — a three-voice groove
-machine with eight scenes.
+Performance patch for the MCN Droid performance rack — a four-voice groove
+machine with eight scenes: drums and sample mangling on the Squid, an acid bass
+on the Domino, a lead over MIDI to the Dimension MK3, and a Bastl PIZZA voice
+with its own pitch, gate, ADSR and LFO.
 
 **Requires DROID firmware blue-7.** The P8S8 is a late-2024 controller; older
 firmware lights it up on boot but never addresses it, which silently kills every
@@ -35,16 +37,63 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 | `G6`–`G8` | Squid: mangle slots |
 | `G9` | Clock out (X7 gate 1) |
 | `G10` | Domino gate (X7 gate 2) |
-| `G11` | Start of bar (X7 gate 3, spare) |
+| `G11` | **PIZZA trigger / gate** (X7 gate 3) |
 | `G12` | Multigrain — mangle engine 4 (X7 gate 4) |
 | `O1`–`O3` | Domino pitch / accent / filter |
+| `O4` | **General purpose LFO** — rate, level and waveform on page 2 |
+| `O5` | **PIZZA pitch** (1V/oct) |
 | `O6`–`O7` | Filter macro, space macro |
-| `O8` | Accent bus |
+| `O8` | **PIZZA ADSR envelope** |
 | MIDI TRS ch.1 | Dimension MK3 |
 | `I1`/`I2` | Clock / reset in — leave unpatched to use the internal clock |
 | `I3`/`I4` | Joystick X/Y (stacked; the joystick also goes straight to Multigrain) |
 
-`O4` and `O5` are free.
+Nothing is spare now. The snare accent bus that used to sit on `O8` is gone —
+the Domino still has its own accent on `O2`.
+
+## PIZZA
+
+A full voice: pitch on `O5`, trigger on `G11`, ADSR on `O8`, and the LFO on `O4`
+for whatever else it needs — FM index, wavefolding, filter.
+
+**`S5.2` chooses what it plays.** That switch is free because Squid channel 2 is
+blank: centre or up and PIZZA doubles the **lead** line in CV alongside the
+Dimension MK3; down and it follows the **Domino bass** line. `P3.10` on page 2
+transposes it ±1 octave either way, so it can sit an octave above the bass or
+under the lead.
+
+## Two pages of knobs
+
+`B4.18` toggles the P10 between two layers — its LED is lit on page 2. The knobs
+hold their own value per page and pick up when you come back, so switching pages
+never jumps a parameter.
+
+| Knob | Page 1 — performance | Page 2 — voice setup |
+|---|---|---|
+| `P3.1` | Drum density | Env attack |
+| `P3.2` | Map X | Env decay |
+| `P3.3` | Map Y | Env sustain |
+| `P3.4` | Gate length | Env release |
+| `P3.5` | Bass density | LFO rate |
+| `P3.6` | Bass accent | LFO level |
+| `P3.7` | Lead density | **Bass pitch spread** (0–1 oct) |
+| `P3.8` | Lead register | **Bass master pitch** (±1 oct) |
+| `P3.9` | Mangle amount | LFO waveform |
+| `P3.10` | Timbre macro | PIZZA transpose (±1 oct) |
+
+## The Domino's pitch range
+
+This is what stops the bass climbing out of register. The line now runs from
+`_BASS_SHIFT` up to `_BASS_SHIFT + _BASS_SPREAD`:
+
+- **`P3.8` master pitch** sets the bottom of the line, ±1 octave from the root,
+  centre-detented at no transposition.
+- **`P3.7` spread** sets how far above that the line may reach, from a single
+  repeated note up to one octave.
+- `B2.8` still shifts the whole thing an octave for a quick drop.
+
+Quantizing is unchanged — `[minifonion]` keeps every note in the key set by
+`B1.4`, so narrowing the spread never puts the line out of tune.
 
 ## Output levels
 
