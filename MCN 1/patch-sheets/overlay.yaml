@@ -90,7 +90,7 @@ controllers:
       - "Drum C"
       - "Drum D"
       # Row 8 — voice patterns + save
-      - "Bass pat"
+      - "Bass pat (PIZZA mode)"
       - "Lead pat"
       - "Mangle pat"
       - "Clear scene"
@@ -109,7 +109,7 @@ controllers:
       - "G8 dens"
     switches:
       - "Mute kick"
-      - "PIZZA src"
+      - "(free)"
       - "Mute snare"
       - "Mute hat"
       - "Mute perc"

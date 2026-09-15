@@ -2,8 +2,8 @@
 
 Performance patch for the MCN Droid performance rack — a four-voice groove
 machine with eight scenes: drums and sample mangling on the Squid, an acid bass
-on the Domino, a lead over MIDI to the Dimension MK3, and a Bastl PIZZA voice
-with its own pitch, gate, ADSR and LFO.
+on the Domino, a lead over MIDI to the Dimension MK3, and a Bastl PIZZA voice that
+switches between sub bass and lead.
 
 **Requires DROID firmware blue-7.** The P8S8 is a late-2024 controller; older
 firmware lights it up on boot but never addresses it, which silently kills every
@@ -56,11 +56,23 @@ the Domino still has its own accent on `O2`.
 A full voice: pitch on `O5`, trigger on `G11`, ADSR on `O8`, and the LFO on `O4`
 for whatever else it needs — FM index, wavefolding, filter.
 
-**`S5.2` chooses what it plays.** That switch is free because Squid channel 2 is
-blank: centre or up and PIZZA doubles the **lead** line in CV alongside the
-Dimension MK3; down and it follows the **Domino bass** line. `P3.10` on page 2
-transposes it ±1 octave either way, so it can sit an octave above the bass or
-under the lead.
+### Two characters
+
+**Hold PAGE (`B4.18`) and press `B4.29`** to switch. The LED is lit in lead mode,
+dark in sub bass — and it **always starts in sub bass**, every power-up, because
+the mode is never written to the SD card.
+
+| | Sub bass (default) | Lead |
+|---|---|---|
+| Plays | the Domino bass line | the lead line, alongside the Dimension MK3 |
+| Octave | −1 | +1 |
+| Glide | generous portamento | almost none |
+| Attack | snappy — the pot's range is scaled right down | full range, up to a slow swell |
+| Release | short, so it stays tight under the kick | long and expressive |
+
+Both modes use the same four envelope knobs on page 2; the mode scales attack and
+release around them, so the knobs stay useful in either character. `P3.10`
+transposes either mode a further ±1 octave.
 
 ## Two pages of knobs
 
@@ -80,6 +92,9 @@ never jumps a parameter.
 | `P3.8` | Lead register | **Bass master pitch** (±1 oct) |
 | `P3.9` | Mangle amount | LFO waveform |
 | `P3.10` | Timbre macro | PIZZA transpose (±1 oct) |
+
+`B4.29` is overlaid the same way: bass pattern advance on page 1, PIZZA mode on
+page 2.
 
 ## The Domino's pitch range
 

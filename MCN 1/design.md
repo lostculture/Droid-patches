@@ -211,15 +211,30 @@ so `P3.8` (master, bipolar ±1 oct) moves the whole line and `P3.7` (spread,
 ### PIZZA — Bastl oscillator, `O5` + `G11` + `O8`
 
 Added when the Javelin came out of the rack, so the envelope and VCA shaping it
-used to provide now come from the DROID. PIZZA has no sequencer of its own:
-a `[switch]` pair points its pitch and gate at either the lead line or the bass
-line, chosen by `S5.2` — free because Squid channel 2 is blank — with `P3.10`
-transposing it ±1 octave so it can sit under the lead or an octave above the
-bass. A `[contour]` on `O8` gives it a full ADSR, and the general `[lfo]` on `O4`
-is available for FM index, folding or filter.
+used to provide now come from the DROID. PIZZA has no sequencer of its own. A bank of `[switch]` circuits, all addressed
+by one mode cable, points its pitch, gate, octave, glide and envelope character
+at either of two personalities:
 
-Reusing an existing line rather than adding a seventh `[algoquencer]` keeps the
-RAM cost to five small circuits.
+| | Sub bass (default) | Lead |
+|---|---|---|
+| Source | Domino bass line | lead line |
+| Octave | −1 | +1 |
+| Glide | 0.1 | 0.02 |
+| Attack scale | 0.1 | 1.0 |
+| Release scale | 0.3 | 2.0 |
+
+The envelope times are scaled rather than replaced, so the same four page-2 pots
+stay meaningful in both characters — a snappy sub and a swelling lead from one
+set of knobs. Time constants are borrowed from the bass modulation engines in
+this repo (`droid-bass-wobble.ini` uses 0.016–0.04 for its 80–200 ms stages).
+
+The mode lives on `B4.29` overlaid on page 2, with `startvalue = 0` and
+`dontsave = 1`, so it is sub bass at every power-up and the state never persists.
+Page 1 keeps `B4.29` as the bass pattern advance, routed through a `[select]` so
+a press on page 2 does not also advance the pattern.
+
+Reusing existing lines rather than adding a seventh `[algoquencer]` keeps the
+whole voice to about a dozen small circuits.
 
 ### Lead — Dimension MK3 over MIDI
 `[midiout]` on channel 1, TRS. Confirmed parameter shapes from the blue-6
