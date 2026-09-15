@@ -338,8 +338,8 @@ Still open, for the hardware:
    density pot is silence with the knob sitting at maximum, and nothing on the
    panel explains it. Every preset-backed pot therefore now carries a musical
    `startvalue`.
-4. **RAM** — six `[algoquencer]` circuits is the heaviest part of the patch.
-   blue-7 reports more free RAM than blue-6, so this may be a non-issue.
+4. ~~**RAM**~~ — measured in Forge: 170 circuits including six `[algoquencer]`
+   use 24% of memory. Not a constraint.
    Check the memory readout in DROID Forge; if it is tight, the first cut is
    dropping the lead algoquencer to a `[euklid]` + `[random]` pitch pair.
 5. **Joystick polarity** — `I3`/`I4` are treated as bipolar (±5 V) so the
@@ -371,14 +371,32 @@ reduced to zero, with nothing on the panel to show which factor did it:
    first version, which is why those channels never once worked while the bass,
    lead and Multigrain — whose expressions happened to fit the form — worked
    throughout. The gates are now built from `[logic]` circuits, and
-   `tools/check-expressions.py` catches the whole class.
+   `tools/check-patch.py` catches the whole class.
 
 The lasting fixes are structural, not one-off: the status row on B32 LEDs 9–12
 shows each factor of the drum path live, the `_USE_P8S8` and `_SWITCH_MUTES`
 constants take whole subsystems out of the signal path in one line, and the five
 patches in `diagnostics/` bisect the rack from wiring up to sequencer.
 
-## 9. Sources
+## 9. DROID Forge conventions
+
+Forge is stricter about comments than the master is, and two of its rules are
+invisible until it complains:
+
+- **Square brackets in a comment are jack-label syntax.** `#  O1: [Bass] Domino
+  pitch` gives that jack a label in Forge. A bracket anywhere else in a comment
+  is a parse error — so circuit names in prose must be written without them.
+  The header of `droid.ini` now labels every jack and control this way, which is
+  worth doing for its own sake: the labels show up on the controls in Forge.
+- **A section is exactly three lines** — divider, title, divider — with any
+  explanation following *after* it. A block that also ends with a divider opens a
+  second section with no title, which Forge reports as "Untitled section".
+
+RAM, for reference: this patch at 170 circuits with six `[algoquencer]` circuits
+uses **24%** of the master's memory, so the earlier worry about size was
+unfounded.
+
+## 10. Sources
 
 - Circuit parameter reference (auto-generated from the DROID `blue-6` manual):
   [Eising/droid-metapatch](https://github.com/Eising/droid-metapatch)

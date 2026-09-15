@@ -1,161 +1,81 @@
 # MCN 1 — Performance Groove Machine
 #
-# Four voices from one DROID: drums and sample mangling on the Squid Salmple,
-# an acid bass on the Domino, a melodic lead over MIDI to the Ziqal Dimension
-# MK3, and a Bastl PIZZA that switches between sub bass and lead.
+# Requires DROID firmware blue-7. The P8S8 is a late-2024 controller and
+# older firmware lights it on boot but never addresses it, which silently
+# kills every channel whose density reads a P5 jack.
+#
+# Four voices from one DROID: drums + sample mangling on the Squid Salmple,
+# acid bass on the Domino, melodic lead over MIDI to the Ziqal Dimension MK3,
+# and a Bastl PIZZA voice that switches between sub bass and lead.
 # Eight scenes recall pattern state and macro pot values.
 #
-# Requires DROID firmware blue-7. The P8S8 is a late-2024 controller and older
-# firmware lights it on boot but never addresses it, which silently kills every
-# channel whose density reads a P5 jack.
+# GATES (G8 expander first, then X7):
+#   G1:     Squid kick
+#   G2:     Squid — left blank on purpose
+#   G3-G5:  Squid snare / hat / perc
+#   G6-G8:  Squid mangle slots (euclidean stutter / slice gates)
+#   G9:     Clock out to the rack          (X7 gate 1)
+#   G10:    Domino gate                    (X7 gate 2)
+#   G11:    PIZZA trigger / gate           (X7 gate 3)
+#   G12:    Multigrain — mangle engine 4    (X7 gate 4)
 #
-# The P10 has three pages, cycled by B4.18. Its LED shows the page by
-# brightness: dark, half, full.
-
-# INPUTS:
-#  I1: [Clock] external clock, internal LFO normalled here when unpatched
-#  I2: [Reset] external reset
-#  I3: [Joy X] macro input only, joystick also goes straight to Multigrain
-#  I4: [Joy Y] macro input only
-
 # OUTPUTS:
-#  O1: [Bass] Domino pitch, quantized, with glide
-#  O2: [Bass acc] Domino accent
-#  O3: [Bass flt] Domino filter envelope
-#  O4: [LFO] general purpose, rate and waveform on page 2
-#  O5: [Pizza CV] PIZZA pitch, 1V/oct
-#  O6: [Pizza FM] PIZZA timbre / FM index, envelope plus LFO
-#  O7: [Pizza mod] PIZZA fold or second destination
-#  O8: [Pizza env] PIZZA ADSR, shaped on page 2
-
-# GATES: G8 expander first, then the X7
-#  G1: [Kick] Squid channel 1
-#  G2: [--] Squid channel 2, left blank on purpose
-#  G3: [Snare] Squid channel 3
-#  G4: [Hat] Squid channel 4
-#  G5: [Perc] Squid channel 5
-#  G6: [Mangle 1] euclidean slice gate
-#  G7: [Mangle 2] euclidean slice gate
-#  G8: [Mangle 3] euclidean slice gate
-#  G9: [Clock] out to the rack, X7 gate 1
-#  G10: [Bass] Domino gate, X7 gate 2
-#  G11: [Pizza] PIZZA trigger, X7 gate 3
-#  G12: [Grain] Multigrain, mangle engine 4, X7 gate 4
-
-# MIDI: TRS out, channel 1 to the Dimension MK3
-#  pitch, gate, velocity from accent, CC1 timbre and CC74 joystick Y
-
-# CONTROLLER 1: p2b8 — transport and voices
-#  P1.1: [Tempo]
-#  P1.2: [Swing]
-#  B1.1: [Run]
-#  B1.2: [Reset]
-#  B1.3: [Clock div] 4 states: /1 /2 /4 /8
-#  B1.4: [Root] 4 states: C F G A
-#  B1.5: [Drums] lit = playing
-#  B1.6: [Bass] lit = playing
-#  B1.7: [Lead] lit = playing
-#  B1.8: [Mangle] lit = playing
-
-# CONTROLLER 2: p2b8 — morph and reroll
-#  P2.1: [Macro] joystick depth
-#  P2.2: [Chaos]
-#  B2.1: [Roll drum] reroll the drum patterns
-#  B2.2: [Roll bass]
-#  B2.3: [Roll lead]
-#  B2.4: [Roll mgl] reroll the mangle rotation
-#  B2.5: [Fill drum] momentary
-#  B2.6: [Fill mgl] momentary
-#  B2.7: [Lead oct] 3 states
-#  B2.8: [Bass oct] 3 states
-
-# CONTROLLER 3: p10 — page 1, performance
-#  P3.1: [Drum dens]
-#  P3.2: [Map X] offbeat bias
-#  P3.3: [Map Y] bar-half bias
-#  P3.4: [Gate len]
-#  P3.5: [Bass dens]
-#  P3.6: [Bass acc]
-#  P3.7: [Lead dens]
-#  P3.8: [Lead reg]
-#  P3.9: [Mangle]
-#  P3.10: [Timbre]
-
-# CONTROLLER 3: p10 — page 2, voice setup
-#  P3.1: [Attack] PIZZA envelope
-#  P3.2: [Decay]
-#  P3.3: [Sustain]
-#  P3.4: [Release]
-#  P3.5: [LFO rate]
-#  P3.6: [LFO level]
-#  P3.7: [Bass sprd] pitch spread, 0-1 octave
-#  P3.8: [Bass mstr] master pitch, +-1 octave
-#  P3.9: [LFO wave]
-#  P3.10: [Pizza tune] +-1 octave
-
-# CONTROLLER 3: p10 — page 3, sequences and modulation
-#  P3.1: [Acid slide] glide on every note
-#  P3.2: [Acid len] 4-32 steps
-#  P3.3: [Sub dens]
-#  P3.4: [Sub len] 4-32 steps
-#  P3.5: [Sub slide]
-#  P3.6: [Sub range]
-#  P3.7: [Env depth] to O6
-#  P3.8: [LFO depth] to O6 and O7
-#  P3.9: [Sub gate]
-#  P3.10: [Acid acc sl] extra slide on accents
-
-# CONTROLLER 4: b32 — scenes, fills, triggers
-#  B4.1: [Scene 1]
-#  B4.2: [Scene 2]
-#  B4.3: [Scene 3]
-#  B4.4: [Scene 4]
-#  B4.5: [Scene 5]
-#  B4.6: [Scene 6]
-#  B4.7: [Scene 7]
-#  B4.8: [Scene 8]
-#  B4.9: [Fill kick] LED shows drums on
-#  B4.10: [Fill snare] LED shows drum density
-#  B4.11: [Fill hat] LED shows channel 1 open
-#  B4.12: [Fill perc] LED shows the clock
-#  B4.13: [Roll mg1]
-#  B4.14: [Roll mg2]
-#  B4.15: [Roll mg3]
-#  B4.16: [Roll grain]
-#  B4.17: [Trig kick]
-#  B4.18: [PAGE] 3 states, LED brightness shows the page
-#  B4.19: [Trig snare]
-#  B4.20: [Trig hat]
-#  B4.21: [Trig perc]
-#  B4.22: [Trig mg1]
-#  B4.23: [Trig mg2]
-#  B4.24: [Trig mg3]
-#  B4.25: [Drum A]
-#  B4.26: [Drum B]
-#  B4.27: [Drum C]
-#  B4.28: [Drum D]
-#  B4.29: [Bass pat] page 1; PIZZA mode on page 2, lit = lead
-#  B4.30: [Lead pat]
-#  B4.31: [Mangle pat] 4 states
-#  B4.32: [Clear] long press clears the current scene
-
-# CONTROLLER 5: p8s8 — per-channel Squid
-#  P5.1: [Kick dens]
-#  P5.2: [--] channel 2 is blank
-#  P5.3: [Snare dens]
-#  P5.4: [Hat dens]
-#  P5.5: [Perc dens]
-#  P5.6: [Mg1 dens]
-#  P5.7: [Mg2 dens]
-#  P5.8: [Mg3 dens]
-#  S5.1: [Mute kick] down mutes, off by default
-#  S5.2: [--] free
-#  S5.3: [Mute snare]
-#  S5.4: [Mute hat]
-#  S5.5: [Mute perc]
-#  S5.6: [Mute mg1]
-#  S5.7: [Mute mg2]
-#  S5.8: [Mute mg3]
+#   O1: Domino pitch (quantized, with slide)
+#   O2: Domino accent
+#   O3: Domino filter envelope
+#   O4: General purpose LFO — rate, level and waveform on page 2
+#   O5: PIZZA pitch (1V/oct)
+#   O6: PIZZA timbre / FM index (envelope + LFO)
+#   O7: PIZZA fold / second modulation (LFO + timbre macro + joystick)
+#   O8: PIZZA ADSR envelope — shaped on page 2
+#
+# INPUTS:
+#   I1: External clock  (internal LFO normalled here when unpatched)
+#   I2: External reset
+#   I3: Joystick X — macro input only, joystick also goes straight to Multigrain
+#   I4: Joystick Y — macro input only
+#
+# MIDI: TRS out, channel 1 — Dimension MK3 (pitch, gate, velocity, CC1 + CC74)
+#
+# CONTROLLER 1 (p2b8) — Transport & mutes
+#   P1.1 Tempo            P1.2 Swing
+#   B1.1 Run/Stop         B1.2 Reset          B1.3 Clock divide   B1.4 Root note
+#   B1.5 Drums on         B1.6 Bass on        B1.7 Lead on        B1.8 Mangle on
+#        (LED lit = voice playing; all four start on)
+#
+# CONTROLLER 2 (p2b8) — Morph & reroll
+#   P2.1 Macro depth      P2.2 Chaos
+#   B2.1 Reroll drums     B2.2 Reroll bass    B2.3 Reroll lead    B2.4 Reroll mangle
+#   B2.5 Fill drums       B2.6 Fill mangle    B2.7 Lead octave    B2.8 Bass octave
+#
+# CONTROLLER 3 (p10) — two pages, toggled by B4.18
+#
+#   PAGE 1 — performance (scene-stored)
+#   P3.1 Drum density     P3.2 Map X          P3.3 Map Y          P3.4 Gate length
+#   P3.5 Bass density     P3.6 Bass accent    P3.7 Lead density   P3.8 Lead register
+#   P3.9 Mangle amount    P3.10 Timbre macro
+#
+#   PAGE 2 — voice setup
+#   P3.1 Env attack       P3.2 Env decay      P3.3 Env sustain    P3.4 Env release
+#   P3.5 LFO rate         P3.6 LFO level      P3.7 Bass spread    P3.8 Bass master pitch
+#   P3.9 LFO waveform     P3.10 PIZZA transpose
+#
+# CONTROLLER 4 (b32) — Scenes, fills, triggers
+#   B4.1 -B4.8  Scenes 1-8
+#   B4.9 -B4.12 Fill kick / snare / hat / perc (momentary)
+#   B4.13-B4.16 Roll mangle 1-4 (G6 / G7 / G8 / Multigrain)
+#   B4.17-B4.24 Manual triggers G1-G8  (B4.18 = PAGE, LED lit = page 2)
+#   B4.29       Bass pattern on page 1, PIZZA mode on page 2
+#               (LED lit = lead, dark = sub bass; always starts sub bass)
+#   B4.25-B4.28 Drum pattern banks A-D
+#   B4.29-B4.31 Bass / lead / mangle pattern advance
+#   B4.32       Clear scene (long press)
+#
+# CONTROLLER 5 (p8s8) — Per-channel Squid
+#   P5.1-P5.8 per-channel density scale, by Squid channel (down = 40%,
+#             up = 100%). P5.2 is free — channel 2 is blank.
+#   S5.1-S5.8 per-channel mute for G1-G8 — disabled by default, see config
+#   S5.2 is free — Squid channel 2 is blank
 
 [p2b8]
 [p2b8]
@@ -163,9 +83,8 @@
 [b32]
 [p8s8]
 
-# -------------------------------------------------
+# =========================================================
 # SCENES
-# -------------------------------------------------
 #
 # Eight presets. Every stateful circuit below takes
 # preset = _SCENE, so switching scene recalls patterns,
@@ -173,6 +92,7 @@
 # stored value was, so nothing jumps when you move them.
 # The P8S8 mute switches are deliberately excluded — a
 # physical switch position must always be the truth.
+# =========================================================
 
 [buttongroup]
     minactive = 1
@@ -210,9 +130,9 @@
     led = L4.32
     longpress = _CLEAR_SCENE
 
-# -------------------------------------------------
+# =========================================================
 # TRANSPORT
-# -------------------------------------------------
+# =========================================================
 
 [pot]
     pot = P1.1
@@ -278,17 +198,17 @@
     input = _CLOCK
     output = G9
 
-# -------------------------------------------------
-# PAGES — B4.18 cycles the P10 through three layers
-# -------------------------------------------------
+# =========================================================
+# PAGE 2 — B4.18 toggles the P10 between two layers
 #
 # Page 1 (LED dark) : the performance controls
 # Page 2 (LED half) : PIZZA envelope, the general LFO, Domino pitch
 # Page 3 (LED full) : sequence lengths, glide, and PIZZA modulation
 #
-# A pot with select only reads its knob while selected, so each
+# A [pot] with select only reads its knob while selected, so each
 # page holds its own values and picks up when you return to it.
 # B4.18 is free because Squid channel 2 is blank.
+# =========================================================
 
 [button]
     button = B4.18
@@ -305,12 +225,12 @@
     input = _PAGE * 0.5
     output = L4.18
 
-# -------------------------------------------------
+# =========================================================
 # MACROS
-# -------------------------------------------------
 #
 # The joystick is read here only. It goes to Multigrain on
 # its own stacked cable — the DROID does not pass it on.
+# =========================================================
 
 [pot]
     pot = P2.1
@@ -435,9 +355,8 @@
     input = _CHAOS * 0.3
     output = _MORPHS
 
-# -------------------------------------------------
+# =========================================================
 # P8S8 PER-CHANNEL FADERS — configuration
-# -------------------------------------------------
 #
 # Each channel's density is scaled by its fader as
 #     P5.n * _FADER_SCALE + _FADER_OFFSET
@@ -448,6 +367,7 @@
 #
 # Setting scale to 0 and offset to 1 takes the P8S8 out of the
 # drum and mangle path entirely without touching anything else.
+# =========================================================
 
 [copy]
     input = 0.6
@@ -489,19 +409,19 @@
     input = P5.8 * _FADER_SCALE + _FADER_OFFSET
     output = _CH8_SCALE
 
-# -------------------------------------------------
+# =========================================================
 # P8S8 SWITCH MUTES
-# -------------------------------------------------
 #
 # Each 3-way switch reads 0.0 / 0.5 / 1.0. These circuits output
 # 1 when the channel is OPEN and 0 when it is muted, which is the
-# form the logic gates below consume directly.
+# form the [logic] gates below consume directly.
 #
 #   _SWITCH_DOWN_OPEN  1 = switches never mute (default)
 #                      0 = pulling a switch fully DOWN mutes it
 #
 # precision = 0.25 gives centre a wide band, 0.25 to 0.75, so a
 # centred switch is never read as DOWN.
+# =========================================================
 
 [copy]
     input = 1
@@ -517,7 +437,7 @@
     output = _CH1_OPEN
 
 # S5.2 belongs to the blank Squid channel 2, kept wired so the
-# channel can be restored with one logic pair writing to G2.
+# channel can be restored with one [logic] pair writing to G2.
 [compare]
     input = S5.2
     compare = 0.5
@@ -581,15 +501,15 @@
     ifequal = 1
     output = _CH8_OPEN
 
-# -------------------------------------------------
+# =========================================================
 # PAGE 2 CONTROLS
-# -------------------------------------------------
 #
 #   P3.1-P3.4  PIZZA envelope   attack / decay / sustain / release
 #   P3.5 P3.6  LFO             rate / level
 #   P3.9       LFO waveform    square - saw - tri - ramp - par - sine
 #   P3.7 P3.8  Domino pitch    spread (0-1 oct) / master (+-1 oct)
 #   P3.10      PIZZA transpose (+-1 oct)
+# =========================================================
 
 [pot]
     pot = P3.1
@@ -661,15 +581,15 @@
     startvalue = 0.5
     bipolar = _PIZZA_TRANSPOSE
 
-# -------------------------------------------------
+# =========================================================
 # PAGE 3 CONTROLS — sequences, glide and PIZZA modulation
-# -------------------------------------------------
 #
 #   P3.1  Acid glide        P3.2  Acid sequence length  (4-32)
 #   P3.3  Sub density       P3.4  Sub sequence length   (4-32)
 #   P3.5  Sub glide         P3.6  Sub pitch range
 #   P3.7  PIZZA env depth   P3.8  PIZZA LFO depth
 #   P3.9  Sub gate length   P3.10 Acid accent glide
+# =========================================================
 
 [pot]
     pot = P3.1
@@ -741,14 +661,14 @@
     startvalue = 0.3
     output = _ACID_ACCENT_GLIDE
 
-# -------------------------------------------------
+# =========================================================
 # VOICE ON / OFF
-# -------------------------------------------------
 #
 # "Voice on" buttons, not mutes: the LED is lit when the voice is
 # PLAYING. dontsave = 1 keeps the state off the SD card, so every
 # power-up starts with all four voices on and a voice can never
 # boot silently off. They still follow the scene while running.
+# =========================================================
 
 [button]
     button = B1.5
@@ -813,13 +733,13 @@
     input = B2.5 * 0.6
     output = _FILL_ALL
 
-# -------------------------------------------------
+# =========================================================
 # DRUMS — Squid G1-G4
-# -------------------------------------------------
 #
 # Map X biases random beats towards offbeats, Map Y towards
 # the second half of the bar. The per-channel P8S8 slider
 # is a bias around the global density (centre = neutral).
+# =========================================================
 
 [algoquencer]
     clock = _CLOCK
@@ -951,13 +871,13 @@
     input2 = B4.21
     or = G5
 
-# -------------------------------------------------
+# =========================================================
 # MANGLE — Squid G5-G8
-# -------------------------------------------------
 #
 # Euclidean slice gates. Mangle amount sets how many beats
 # land in each 16-step cycle; the four channels sit at
 # different rotations so they interlock rather than stack.
+# =========================================================
 
 [button]
     button = B4.31
@@ -1099,9 +1019,9 @@
     input = _MG4_GATE * _MANGLE_ON + _MG4_ROLL
     output = G12
 
-# -------------------------------------------------
+# =========================================================
 # BASS — Domino, G10 + O1-O3
-# -------------------------------------------------
+# =========================================================
 
 # Domino pitch range. _BASS_SHIFT is the bottom of the line and
 # _BASS_TOP the ceiling, so spread widens the line upward from
@@ -1146,6 +1066,7 @@
     length = _ACID_LENGTH * 28 + 4
     activity = _BASS_DENSITY
     variation = _CHAOS * 0.7
+    offbeats = 0.35
     rolls = _CHAOS * 0.25
     rollcount = 2
     dejavu = _DEJAVU
@@ -1217,9 +1138,9 @@
     level = _BASS_ACC * 0.4 + 0.6
     output = O3
 
-# -------------------------------------------------
+# =========================================================
 # LEAD — Dimension MK3 over MIDI
-# -------------------------------------------------
+# =========================================================
 
 [button]
     button = B2.7
@@ -1282,9 +1203,8 @@
     ccnumber2 = 74
     cc2 = _MAP_Y
 
-# -------------------------------------------------
+# =========================================================
 # SUB BASS LINE — PIZZA's own sequence, not the acid line
-# -------------------------------------------------
 #
 # Deliberately simple: a euclidean gate with its own length and
 # density, and a pitch that picks between root, fifth and octave.
@@ -1293,6 +1213,7 @@
 #
 # Controls are all on page 3: P3.3 density, P3.4 length,
 # P3.9 gate length, P3.6 pitch range, P3.5 glide.
+# =========================================================
 
 [euklid]
     clock = _CLOCK
@@ -1321,9 +1242,8 @@
     select5 = 1
     output = _SUB_PITCH
 
-# -------------------------------------------------
+# =========================================================
 # PIZZA — Bastl oscillator voice, two characters
-# -------------------------------------------------
 #
 #   O5   1V/oct pitch, with mode-dependent glide
 #   G11  trigger / gate
@@ -1344,6 +1264,7 @@
 # Both modes read the same four envelope pots on page 2; the mode
 # scales attack and release around them. P3.10 transposes either
 # mode a further +-1 octave.
+# =========================================================
 
 [button]
     button = B4.29
@@ -1445,12 +1366,12 @@
     input = _LFO_OUT
     output = O4
 
-# -------------------------------------------------
+# =========================================================
 # MACRO CV OUT
-# -------------------------------------------------
+# =========================================================
 
 # O6 — PIZZA timbre / FM index: the envelope, plus a helping of LFO.
-# mixer sums without running into the one-multiplication limit.
+# [mixer] sums without running into the one-multiplication limit.
 [copy]
     input = _PIZZA_ENV * _PIZZA_ENV_DEPTH
     output = _PIZZA_MOD_ENV
@@ -1472,9 +1393,8 @@
     input3 = _MACRO_Y
     output = O7
 
-# -------------------------------------------------
+# =========================================================
 # STATUS ROW — B32 LEDs 9 to 12
-# -------------------------------------------------
 #
 # The fill buttons have no LEDs of their own, so they show the
 # state of the drum path. If the drums are silent, this says
@@ -1484,6 +1404,7 @@
 #   L4.10  drum density          dark  -> turn P3.1 up
 #   L4.11  channel 1 open        dark  -> S5.1 is muting
 #   L4.12  clock                 dark  -> transport stopped, B1.1
+# =========================================================
 
 [copy]
     input = _DRUMS_ON
@@ -1501,9 +1422,9 @@
     input = _CLOCK
     output = L4.12
 
-# -------------------------------------------------
+# =========================================================
 # ACTIVITY LEDS — the trigger row mirrors the gates
-# -------------------------------------------------
+# =========================================================
 
 [copy]
     input = G1

@@ -245,10 +245,11 @@ input = _D1_TRIG * _DRUMS_ON * (-1 * _MUTE1 * _SWITCH_MUTES + 1) + B4.17
 They are now built from `[logic]` instead — `and` to combine the trigger with
 the voice and channel enables, `or` to fold in the manual trigger and rolls.
 
-`tools/check-expressions.py` in the repo root catches this:
+`tools/check-patch.py` in the repo root catches this, along with duplicate
+parameters and the comment style DROID Forge objects to:
 
 ```bash
-python tools/check-expressions.py "MCN 1/droid.ini"
+python tools/check-patch.py "MCN 1/droid.ini"
 ```
 
 ## Diagnostics
