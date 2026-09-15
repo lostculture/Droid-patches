@@ -42,7 +42,8 @@ Gates are numbered continuously across the expanders — G8 first, then X7:
 | `O1`–`O3` | Domino pitch / accent / filter |
 | `O4` | **General purpose LFO** — rate, level and waveform on page 2 |
 | `O5` | **PIZZA pitch** (1V/oct) |
-| `O6`–`O7` | Filter macro, space macro |
+| `O6` | **PIZZA timbre / FM index** (envelope + LFO) |
+| `O7` | **PIZZA fold / second modulation** (LFO + timbre macro + joystick) |
 | `O8` | **PIZZA ADSR envelope** |
 | MIDI TRS ch.1 | Dimension MK3 |
 | `I1`/`I2` | Clock / reset in — leave unpatched to use the internal clock |
@@ -64,7 +65,7 @@ the mode is never written to the SD card.
 
 | | Sub bass (default) | Lead |
 |---|---|---|
-| Plays | the Domino bass line | the lead line, alongside the Dimension MK3 |
+| Plays | **its own euclidean sub line** | the lead line, alongside the Dimension MK3 |
 | Octave | −1 | +1 |
 | Glide | generous portamento | almost none |
 | Attack | snappy — the pot's range is scaled right down | full range, up to a slow swell |
@@ -74,11 +75,29 @@ Both modes use the same four envelope knobs on page 2; the mode scales attack an
 release around them, so the knobs stay useful in either character. `P3.10`
 transposes either mode a further ±1 octave.
 
+### The sub line
+
+Deliberately not the acid line, and deliberately simple. A euclidean gate with
+its own length and density, and a pitch that picks between root, fifth and
+octave — a sub part wants to sit still and hold, not play a melody. Everything
+about it is on page 3: `P3.3` density, `P3.4` length, `P3.9` gate length, `P3.6`
+pitch range, `P3.5` glide.
+
+### PIZZA's modulation
+
+`O6` carries the envelope plus a helping of LFO, for FM index or timbre. `O7`
+carries LFO plus the timbre macro and joystick Y, so a second destination —
+wavefolder, say — stays under your hands mid-performance. Depths are `P3.7` and
+`P3.8` on page 3.
+
+These took over `O6`/`O7` from the filter and space macros, so the C4RBN and
+Aurora are now audio-path only and take no CV from the DROID.
+
 ## Two pages of knobs
 
-`B4.18` toggles the P10 between two layers — its LED is lit on page 2. The knobs
-hold their own value per page and pick up when you come back, so switching pages
-never jumps a parameter.
+`B4.18` cycles the P10 through three layers — its LED shows which: dark, half
+brightness, full. The knobs hold their own value per page and pick up when you
+come back, so switching pages never jumps a parameter.
 
 | Knob | Page 1 — performance | Page 2 — voice setup |
 |---|---|---|
@@ -92,6 +111,24 @@ never jumps a parameter.
 | `P3.8` | Lead register | **Bass master pitch** (±1 oct) |
 | `P3.9` | Mangle amount | LFO waveform |
 | `P3.10` | Timbre macro | PIZZA transpose (±1 oct) |
+
+### Page 3 — sequences, glide and PIZZA modulation
+
+| Knob | Does |
+|---|---|
+| `P3.1` | **Acid glide** — portamento on every note of the bass line |
+| `P3.2` | **Acid sequence length** — 4 to 32 steps |
+| `P3.3` | Sub density |
+| `P3.4` | **Sub sequence length** — 4 to 32 steps |
+| `P3.5` | Sub glide |
+| `P3.6` | Sub pitch range |
+| `P3.7` | PIZZA envelope depth → `O6` |
+| `P3.8` | PIZZA LFO depth → `O6`/`O7` |
+| `P3.9` | Sub gate length |
+| `P3.10` | **Acid accent glide** — extra slide on accented notes only |
+
+The two sequence lengths are independent, so the acid line and the sub line can
+run at different lengths and drift in and out of phase with each other.
 
 `B4.29` is overlaid the same way: bass pattern advance on page 1, PIZZA mode on
 page 2.

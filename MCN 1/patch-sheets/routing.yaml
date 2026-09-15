@@ -44,17 +44,17 @@ pages:
 
       - id: pizza
         type: PIZZA
-        label: "O5 pitch · G11 · O8 env"
+        label: "O5 O8 G11 · O6 O7 mod"
         pos: [4, 0]
 
       - id: carbn
         type: C4RBN
-        label: "O6 filter macro"
+        label: "audio path only"
         pos: [4, 1]
 
       - id: fx
         type: AURORA / FX AID
-        label: "O7 space macro"
+        label: "audio path only"
         pos: [4, 3]
 
       - id: clockout
@@ -96,13 +96,9 @@ pages:
         signal: cv
         label: "O5 pitch · O8 env"
       - from: droid
-        to: carbn
-        signal: cv
-        label: "O6"
-      - from: droid
-        to: fx
-        signal: cv
-        label: "O7"
+        to: pizza
+        signal: mod
+        label: "O6 O7"
       - from: droid
         to: clockout
         signal: gate

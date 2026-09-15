@@ -39,18 +39,18 @@ controllers:
 
   - type: p10
     index: 3
-    name: "Live Parameters — page 2 in ()"
+    name: "Page 1 — pages 2/3 in README"
     pots:
-      - "Drum density (Attack)"
-      - "Map X (Decay)"
-      - "Map Y (Sustain)"
-      - "Gate length (Release)"
-      - "Bass density (LFO rate)"
-      - "Bass accent (LFO level)"
-      - "Lead density (Bass spread)"
-      - "Lead register (Bass pitch)"
-      - "Mangle amount (LFO wave)"
-      - "Timbre macro (PIZZA tune)"
+      - "Drum density"
+      - "Map X"
+      - "Map Y"
+      - "Gate length"
+      - "Bass density"
+      - "Bass accent"
+      - "Lead density"
+      - "Lead register"
+      - "Mangle amount"
+      - "Timbre macro"
 
   - type: b32
     index: 4
@@ -77,7 +77,7 @@ controllers:
       - "Roll Mgrain"
       # Row 5-6 — manual triggers
       - "Trig kick"
-      - "PAGE 1/2"
+      - "PAGE 1/2/3"
       - "Trig snare"
       - "Trig hat"
       - "Trig perc"

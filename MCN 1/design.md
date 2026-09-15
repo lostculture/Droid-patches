@@ -84,8 +84,8 @@ So the physical wiring maps as:
 | `O3` | Domino filter / mod |
 | `O4` | General purpose LFO — rate, level, waveform on page 2 |
 | `O5` | PIZZA pitch (1V/oct) |
-| `O6` | Global filter macro (C4RBN / Dimension) |
-| `O7` | Space macro (Aurora / FX AID) |
+| `O6` | PIZZA timbre / FM index (envelope + LFO) |
+| `O7` | PIZZA fold / second modulation (LFO + timbre macro + joystick) |
 | `O8` | PIZZA ADSR envelope |
 | MIDI TRS ch.1 | Dimension MK3: pitch + gate + velocity, CC1/CC2 |
 | `I1` / `I2` | External clock / reset (internal LFO normalled when unpatched) |
@@ -208,6 +208,10 @@ climbing out of bass register. `pitchlow` and `pitchhigh` are now driven:
 so `P3.8` (master, bipolar ±1 oct) moves the whole line and `P3.7` (spread,
 0–1 oct) sets how far it may travel upward — from one repeated note to an octave.
 
+**Glide** is a base amount on every note (`P3.1`, page 3) summed in a `[mixer]`
+with an accent-gated extra (`P3.10`), which is the 303 behaviour where accent and
+slide travel together. **Length** is `P3.2`, 4–32 steps.
+
 ### PIZZA — Bastl oscillator, `O5` + `G11` + `O8`
 
 Added when the Javelin came out of the rack, so the envelope and VCA shaping it
@@ -217,7 +221,7 @@ at either of two personalities:
 
 | | Sub bass (default) | Lead |
 |---|---|---|
-| Source | Domino bass line | lead line |
+| Source | its own euclidean sub line | lead line |
 | Octave | −1 | +1 |
 | Glide | 0.1 | 0.02 |
 | Attack scale | 0.1 | 1.0 |
@@ -235,6 +239,18 @@ a press on page 2 does not also advance the pattern.
 
 Reusing existing lines rather than adding a seventh `[algoquencer]` keeps the
 whole voice to about a dozen small circuits.
+
+### Sub bass line — PIZZA's own sequence
+
+Kept separate from the acid line, because a sub doubling the bass line is not a
+sub part. `[euklid]` gives the gate with independent length and density,
+`[gatetool]` sets how long each note holds, and a 3-step `[random]` through
+`[minifonion]` picks between root, fifth and octave. Four small circuits rather
+than a seventh `[algoquencer]`.
+
+Because the acid and sub lengths are independent (4–32 steps each), the two bass
+parts drift in and out of phase, which is most of the interest in a sub part that
+plays so few notes.
 
 ### Lead — Dimension MK3 over MIDI
 `[midiout]` on channel 1, TRS. Confirmed parameter shapes from the blue-6
